@@ -1,0 +1,58 @@
+{
+  "name": "@webext-pegasus/rpc",
+  "version": "0.0.1",
+  "description": "RPC Messaging in Web Extensions made easy and type safe. Out of the box.",
+  "keywords": [
+    "chrome",
+    "extension",
+    "messaging",
+    "communication",
+    "protocol",
+    "content",
+    "background",
+    "devtools",
+    "script",
+    "crx",
+    "bridge"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsup-build": "tsup index.ts --format cjs,esm --dts",
+    "build": "npm run tsup-build --dts-resolve",
+    "prepublishOnly": "npm run build"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "README.md",
+    "package.json",
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StyleT/webext-pegasus.git",
+    "directory": "packages/transport"
+  },
+  "author": "Vladlen Fedosov <vlad.fedosov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/StyleT/webext-pegasus/issues"
+  },
+  "homepage": "https://github.com/StyleT/webext-pegasus#readme",
+  "dependencies": {
+    "type-fest": "^0.21.3",
+    "@webext-pegasus/transport": "0.0.1"
+  }
+}

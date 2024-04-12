@@ -1,0 +1,102 @@
+{
+  "name": "@webext-pegasus/transport",
+  "version": "0.0.1",
+  "description": "Turns surface specific browser APIs into unified transport layer",
+  "keywords": [
+    "chrome",
+    "extension",
+    "messaging",
+    "communication",
+    "protocol",
+    "content",
+    "background",
+    "devtools",
+    "script",
+    "crx",
+    "bridge"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsup-build": "tsup index.ts background.ts content-script.ts devtools.ts popup.ts window.ts options.ts --format cjs,esm --dts",
+    "build": "npm run tsup-build --dts-resolve",
+    "prepublishOnly": "npm run build"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./background": {
+      "import": "./dist/background.js",
+      "require": "./dist/background.cjs"
+    },
+    "./content-script": {
+      "import": "./dist/content-script.js",
+      "require": "./dist/content-script.cjs"
+    },
+    "./devtools": {
+      "import": "./dist/devtools.js",
+      "require": "./dist/devtools.cjs"
+    },
+    "./options": {
+      "import": "./dist/options.js",
+      "require": "./dist/options.cjs"
+    },
+    "./popup": {
+      "import": "./dist/popup.js",
+      "require": "./dist/popup.cjs"
+    },
+    "./window": {
+      "import": "./dist/window.js",
+      "require": "./dist/window.cjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "background": [
+        "dist/background.d.ts"
+      ],
+      "content-script": [
+        "dist/content-script.d.ts"
+      ],
+      "devtools": [
+        "dist/devtools.d.ts"
+      ],
+      "options": [
+        "dist/options.d.ts"
+      ],
+      "popup": [
+        "dist/popup.d.ts"
+      ],
+      "window": [
+        "dist/window.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "README.md",
+    "package.json",
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StyleT/webext-pegasus.git",
+    "directory": "packages/transport"
+  },
+  "author": "Vladlen Fedosov <vlad.fedosov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/StyleT/webext-pegasus/issues"
+  },
+  "homepage": "https://github.com/StyleT/webext-pegasus#readme",
+  "dependencies": {
+    "type-fest": "^0.21.3",
+    "webext-bridge": "^6.0.1",
+    "@types/webextension-polyfill": "^0.10.7",
+    "webextension-polyfill": "0.10.0"
+  }
+}

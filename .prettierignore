@@ -1,0 +1,14 @@
+# NOTE: In general this should be kept in sync with .eslintignore
+
+packages/**/dist/**
+packages/**/build/**
+packages/**/npm/**
+packages/**/config/**
+packages/**/vite.config.js
+packages/**/vite.prod.config.js
+**/*.md
+**/*.js.flow
+**/node_modules
+.ts-temp
+.github/CODEOWNERS
+.prettierignore

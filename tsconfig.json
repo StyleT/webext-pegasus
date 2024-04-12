@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "module": "esnext",
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "downlevelIteration": true,
+    "noEmit": true,
+    "strict": true,
+    "baseUrl": ".",
+    "typeRoots": ["node_modules/@types"],
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+
+    "paths": {
+      "@webext-pegasus/transport": ["./packages/transport/"],
+      "@webext-pegasus/rpc": ["./packages/rpc/"],
+      "@webext-pegasus/store": ["./packages/store/"],
+      "@webext-pegasus/store-zustand": ["./packages/store-zustand/"]
+    }
+  },
+  "include": ["./packages"],
+  "exclude": [
+    "**/packages/**/src/__tests__/**",
+    "**/dist/**",
+    "**/npm/**",
+    "**/node_modules/**"
+  ],
+  "typedocOptions": {
+    "logLevel": "Verbose"
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "transpileOnly": true
+  }
+}
