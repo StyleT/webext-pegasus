@@ -45,8 +45,8 @@ jobs:
       #     sarif_file: eslint-results.sarif
       #     wait-for-processing: true
 
-      - name: Checking typings
-        run: npm run tsc
-
       - name: Building packages
         run: npm run build
+
+      - name: Checking typings
+        run: npm run tsc
