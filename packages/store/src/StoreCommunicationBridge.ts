@@ -1,4 +1,5 @@
-import {IPegasusRPCService, PegasusRPCMessage} from '../rpc/types';
+import {IPegasusRPCService, PegasusRPCMessage} from '@webext-pegasus/rpc';
+
 import {
   DeserializerFn,
   IPegasusStore,
