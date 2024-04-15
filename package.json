@@ -19,6 +19,7 @@
     "prepare": "husky install",
     "build": "npm run build --workspaces",
     "lint": "eslint ./",
+    "lint:sarif": "npm run lint --  --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write ."
   },
@@ -33,6 +34,7 @@
     "@types/jest": "^29.4.0",
     "@babel/eslint-parser": "^7.24.1",
     "@babel/preset-env": "^7.24.4",
+    "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "child-process-promise": "^2.2.1",
     "concurrently": "^6.2.0",
     "confusing-browser-globals": "^1.0.10",
