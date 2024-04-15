@@ -47,7 +47,12 @@ export class MathService
 **background.ts**
 ```typescript
 import {registerRPCService} from '@webext-pegasus/rpc';
+import {initPegasusTransport} from '@webext-pegasus/transport/background';
+
 import {MathService} from './MathService.ts';
+
+// Done once in every runtime context to init transport layer
+initPegasusTransport();
 
 registerRPCService(
   'MathService',
@@ -62,6 +67,10 @@ registerRPCService(
 import type {IMathService} from './MathService.ts';
 
 import {getRPCService} from '@webext-pegasus/rpc';
+import {initPegasusTransport} from '@webext-pegasus/transport/window';
+
+// Done once in every runtime context to init transport layer
+initPegasusTransport();
 
 const mathService = getRPCService<IMathService>(
   // Same ID that was used for registration
