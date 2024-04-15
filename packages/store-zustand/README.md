@@ -1,6 +1,16 @@
+![webext-pegasus Logo](https://github.com/StyleT/webext-pegasus/blob/main/assets/logo.png?raw=true)
+
 # @webext-pegasus/store-zustand
 
+![License](https://badgen.net/github/license/StyleT/webext-pegasus)
+![Package version](https://badgen.net/npm/v/@webext-pegasus%2Fstore-zustand)
+
 Zustand adapter to share state between pages (content script, injected script, popup, devtools, etc..) and background in web extensions.
+
+## Supports
+
+* **Runtime contexts:** window (injected script), popup, devtools, content script, background, options, sidepanel (_planned_)
+* **Browsers:** Chrome, Firefox, Safari, Opera, Edge + others supported by [webextension-polyfill](https://github.com/mozilla/webextension-polyfill)
 
 ## 🚀 Quick Start
 
