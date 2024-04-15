@@ -8,7 +8,7 @@ import {ZustandAction} from './types';
 export async function pegasusZustandStoreReady<S>(
   storeName: string,
   store: StoreApi<S>,
-): Promise<void> {
+): Promise<StoreApi<S>> {
   const configuration = getConfiguration();
 
   const proxyStore = new PegasusStore<S, ZustandAction<S>>({
@@ -64,4 +64,6 @@ export async function pegasusZustandStoreReady<S>(
     // resub
     unsubscribe = store.subscribe(callback);
   });
+
+  return store;
 }
