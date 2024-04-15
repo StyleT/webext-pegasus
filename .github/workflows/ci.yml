@@ -37,16 +37,16 @@ jobs:
         run: npm run prettier
 
       - name: Run ESLint
-        run: npm run lint:sarif
-        continue-on-error: true
-      - name: Upload ESLint analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: eslint-results.sarif
-          wait-for-processing: true
+        run: npm run lint # :sarif
+        # continue-on-error: true
+      # - name: Upload ESLint analysis results to GitHub
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: eslint-results.sarif
+      #     wait-for-processing: true
 
       - name: Checking typings
-        run: npm tsc
+        run: npm run tsc
 
       - name: Building packages
         run: npm run build
