@@ -3,6 +3,7 @@
 # @webext-pegasus/store-zustand
 
 ![License](https://badgen.net/github/license/StyleT/webext-pegasus)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
 ![Package version](https://badgen.net/npm/v/@webext-pegasus%2Fstore-zustand)
 
 Zustand adapter to share state between pages (content script, injected script, popup, devtools, etc..) and background in web extensions.

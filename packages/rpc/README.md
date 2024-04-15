@@ -3,6 +3,7 @@
 # @webext-pegasus/rpc
 
 ![License](https://badgen.net/github/license/StyleT/webext-pegasus)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
 ![Package version](https://badgen.net/npm/v/@webext-pegasus%2Frpc)
 
 RPC Messaging in Web Extensions made easy and type safe. Out of the box.

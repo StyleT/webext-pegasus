@@ -3,6 +3,7 @@
 # webext-pegasus
 
 ![License](https://badgen.net/github/license/StyleT/webext-pegasus)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
 ![@webext-pegasus/transport version](https://badgen.net/npm/v/@webext-pegasus%2Ftransport?label=@webext-pegasus%2Ftransport)
 ![@webext-pegasus/rpc version](https://badgen.net/npm/v/@webext-pegasus%2Frpc?label=@webext-pegasus%2Frpc)
 ![@webext-pegasus/store version](https://badgen.net/npm/v/@webext-pegasus%2Fstore?label=@webext-pegasus%2Fstore)
