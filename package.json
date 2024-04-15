@@ -5,7 +5,10 @@
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/transport",
+    "packages/rpc",
+    "packages/store",
+    "packages/store-zustand"
   ],
   "engines": {
     "npm": ">=8.2.3"
@@ -14,7 +17,7 @@
   "scripts": {
     "tsc": "tsc",
     "prepare": "husky install",
-    "build": "npm run build -w @webext-pegasus/transport && npm run build -w @webext-pegasus/rpc && npm run build -w @webext-pegasus/store && npm run build -w @webext-pegasus/store-zustand",
+    "build": "npm run build --workspaces",
     "lint": "eslint ./",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write ."
