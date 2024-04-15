@@ -16,7 +16,8 @@ export type IStoreCommunicationBridge<
 export class StoreCommunicationBridge<
   S,
   A extends PegasusStoreAction = PegasusStoreAnyAction,
-> implements IPegasusRPCService<StoreCommunicationBridge<S, A>> {
+> implements IPegasusRPCService<StoreCommunicationBridge<S, A>>
+{
   constructor(
     private readonly store: IPegasusStore<S, A>,
     private readonly serializer: SerializerFn<S | A>,

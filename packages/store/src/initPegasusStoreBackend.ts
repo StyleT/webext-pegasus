@@ -14,7 +14,10 @@ import {
   StateDiff,
 } from './types';
 
-export type PegasusStoreBackendProps<S, A extends PegasusStoreAction = PegasusStoreAnyAction> = {
+export type PegasusStoreBackendProps<
+  S,
+  A extends PegasusStoreAction = PegasusStoreAnyAction,
+> = {
   portName: string;
   serializer: SerializerFn<S | StateDiff<S> | A>;
   deserializer: DeserializerFn<A>;
@@ -29,7 +32,12 @@ export function initPegasusStoreBackend<
   A extends PegasusStoreAction = PegasusStoreAnyAction,
 >(
   store: IPegasusStore<S, A>,
-  {portName, serializer, deserializer, diffStrategy = shallowDiff}: PegasusStoreBackendProps<S, A>,
+  {
+    portName,
+    serializer,
+    deserializer,
+    diffStrategy = shallowDiff,
+  }: PegasusStoreBackendProps<S, A>,
 ) {
   const {emitEvent} = getMessagingAPI();
 

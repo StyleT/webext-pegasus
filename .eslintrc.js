@@ -61,7 +61,7 @@ module.exports = {
         '@typescript-eslint/no-this-alias': OFF,
         '@typescript-eslint/no-unused-vars': [ERROR, {args: 'none'}],
       },
-    }
+    },
   ],
 
   parser: '@babel/eslint-parser',

@@ -14,7 +14,10 @@ import {
   StateDiff,
 } from './types';
 
-export type PegasusStoreProps<S, A extends PegasusStoreAction = PegasusStoreAnyAction> = {
+export type PegasusStoreProps<
+  S,
+  A extends PegasusStoreAction = PegasusStoreAnyAction,
+> = {
   portName: string;
   serializer: SerializerFn<S | StateDiff<S> | A>;
   deserializer: DeserializerFn<S | StateDiff<S> | A>;
@@ -25,7 +28,8 @@ export type PegasusStoreProps<S, A extends PegasusStoreAction = PegasusStoreAnyA
 export class PegasusStore<
   S,
   A extends PegasusStoreAction = PegasusStoreAnyAction,
-> implements IPegasusStore<S, A> {
+> implements IPegasusStore<S, A>
+{
   private readonly bridge;
   private readonly serializer;
   private readonly deserializer;

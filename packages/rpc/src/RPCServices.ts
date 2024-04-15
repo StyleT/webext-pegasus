@@ -1,4 +1,4 @@
-import type {Destination,IPegasusRPCService, PegasusRPCService} from './types';
+import type {Destination, IPegasusRPCService, PegasusRPCService} from './types';
 
 import {getMessagingAPI} from '@webext-pegasus/transport';
 
