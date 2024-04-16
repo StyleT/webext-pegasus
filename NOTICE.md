@@ -19,3 +19,11 @@ which can be obtained at:
 
   * **LICENSE:** [MIT](https://github.com/aklinker1/webext-core/blob/e0889ce7bbfa1a168a4b11dac2611dffed3db4a7/LICENSE)
   * **HOMEPAGE:** https://github.com/aklinker1/webext-core/tree/main/packages/proxy-service
+
+------
+
+This product contains a modified version of Server Side Up's "webext-bridge",
+which can be obtained at:
+
+  * **LICENSE:** [MIT](https://github.com/serversideup/webext-bridge/blob/ef31ac32283c2adf5d12aeb30ca1627628e17384/LICENSE)
+  * **HOMEPAGE:** https://github.com/serversideup/webext-bridge

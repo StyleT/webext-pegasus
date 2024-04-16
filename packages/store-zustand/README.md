@@ -51,10 +51,12 @@ export function bearStoreReady = () => pegasusZustandStoreReady(STORE_NAME, useB
 `background.ts`
 
 ```js
+import { initPegasusTransport } from '@webext-pegasus/transport/background';
 import { initPegasusZustandStoreBackend } from '@webext-pegasus/store-zustand';
 
 import {useBearStore as store, STORE_NAME} from './store';
 
+initPegasusTransport();
 initPegasusZustandStoreBackend(STORE_NAME, store);
 
 // listen state changes
