@@ -4,10 +4,10 @@
 
 ![License](https://badgen.net/github/license/StyleT/webext-pegasus)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
-![@webext-pegasus/transport version](https://badgen.net/npm/v/@webext-pegasus%2Ftransport?label=@webext-pegasus%2Ftransport)
-![@webext-pegasus/rpc version](https://badgen.net/npm/v/@webext-pegasus%2Frpc?label=@webext-pegasus%2Frpc)
-![@webext-pegasus/store version](https://badgen.net/npm/v/@webext-pegasus%2Fstore?label=@webext-pegasus%2Fstore)
-![@webext-pegasus/store-zustand version](https://badgen.net/npm/v/@webext-pegasus%2Fstore-zustand?label=@webext-pegasus%2Fstore-zustand)
+[![@webext-pegasus/transport version](https://badgen.net/npm/v/@webext-pegasus%2Ftransport?label=@webext-pegasus%2Ftransport)](https://www.npmjs.com/package/@webext-pegasus/transport)
+[![@webext-pegasus/rpc version](https://badgen.net/npm/v/@webext-pegasus%2Frpc?label=@webext-pegasus%2Frpc)](https://www.npmjs.com/package/@webext-pegasus/rpc)
+[![@webext-pegasus/store version](https://badgen.net/npm/v/@webext-pegasus%2Fstore?label=@webext-pegasus%2Fstore)](https://www.npmjs.com/package/@webext-pegasus/store)
+[![@webext-pegasus/store-zustand version](https://badgen.net/npm/v/@webext-pegasus%2Fstore-zustand?label=@webext-pegasus%2Fstore-zustand)](https://www.npmjs.com/package/@webext-pegasus/store-zustand)
 
 Communication framework for browser extensions, with wings!
 

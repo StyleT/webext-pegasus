@@ -4,7 +4,7 @@
 
 ![License](https://badgen.net/github/license/StyleT/webext-pegasus)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
-![Package version](https://badgen.net/npm/v/@webext-pegasus%2Fstore)
+[![Package version](https://badgen.net/npm/v/@webext-pegasus%2Fstore)](https://www.npmjs.com/package/@webext-pegasus/store)
 
 A set of utilities for building Redux/Zustand/Mobx/etc applications in Web Extensions.
 

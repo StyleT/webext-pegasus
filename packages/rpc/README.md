@@ -4,7 +4,7 @@
 
 ![License](https://badgen.net/github/license/StyleT/webext-pegasus)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
-![Package version](https://badgen.net/npm/v/@webext-pegasus%2Frpc)
+[![Package version](https://badgen.net/npm/v/@webext-pegasus%2Frpc)](https://www.npmjs.com/package/@webext-pegasus/rpc)
 
 RPC Messaging in Web Extensions made easy and type safe. Out of the box.
 It provides a simple type-safe wrapper around the web extension messaging APIs that lets you call a function/class from anywhere, but execute it in the target runtime context.
