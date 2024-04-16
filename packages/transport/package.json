@@ -1,6 +1,6 @@
 {
   "name": "@webext-pegasus/transport",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Turns surface specific browser APIs into unified transport layer",
   "keywords": [
     "chrome",

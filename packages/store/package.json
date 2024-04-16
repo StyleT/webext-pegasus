@@ -1,6 +1,6 @@
 {
   "name": "@webext-pegasus/store",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A set of utilities for building Redux/Zustand/Mobx/etc applications in Web Extensions.",
   "keywords": [
     "chrome",

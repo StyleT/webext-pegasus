@@ -1,6 +1,6 @@
 {
   "name": "@webext-pegasus/store-zustand",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Zustand adapter to share state between pages and background in web extensions.",
   "keywords": [
     "chrome",
