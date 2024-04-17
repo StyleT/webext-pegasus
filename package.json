@@ -22,7 +22,9 @@
     "lint:sarif": "npm run lint --  --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write .",
-    "link": "npm link --workspaces"
+    "link": "npm link --workspaces",
+    "bump-version": "lerna version",
+    "publish": "npm publish --workspaces --access public"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.24.1",
@@ -43,6 +45,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-ft-flow": "^2.0.3",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^28.2.0",
@@ -59,7 +62,7 @@
     "jest-environment-jsdom": "^29.4.0",
     "jsdom": "^24.0.0",
     "lerna": "^8.1.2",
-    "lint-staged": "^11.1.0",
+    "lint-staged": "^11.2.6",
     "minimist": "^1.2.5",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.3.2",
@@ -70,6 +73,5 @@
     "tsup": "^8.0.2",
     "typedoc": "^0.25.12",
     "typescript": "5.1.6"
-  },
-  "dependencies": {}
+  }
 }
