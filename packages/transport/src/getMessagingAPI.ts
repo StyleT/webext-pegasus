@@ -1,6 +1,6 @@
 import type {JsonValue} from 'type-fest';
 
-import {Destination, OnMessageCallback} from 'webext-bridge';
+import {Destination, OnMessageCallback} from './types';
 
 type SendMessageFn = (
   messageID: string,

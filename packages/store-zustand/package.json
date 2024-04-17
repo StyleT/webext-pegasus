@@ -53,7 +53,7 @@
   "homepage": "https://github.com/StyleT/webext-pegasus#readme",
   "dependencies": {
     "type-fest": "^0.21.3",
-    "@webext-pegasus/store": "0.0.1"
+    "@webext-pegasus/store": "0.0.2"
   },
   "devDependencies": {
     "zustand": "^4.5.2"

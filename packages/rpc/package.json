@@ -53,6 +53,6 @@
   "homepage": "https://github.com/StyleT/webext-pegasus#readme",
   "dependencies": {
     "type-fest": "^0.21.3",
-    "@webext-pegasus/transport": "0.0.1"
+    "@webext-pegasus/transport": "0.0.2"
   }
 }
