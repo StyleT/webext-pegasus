@@ -54,7 +54,6 @@ export function initPegasusTransport({
         }),
       );
     }
-
   });
 
   port.onMessage(endpointRuntime.handleMessage);

@@ -24,7 +24,10 @@ export interface EndpointRuntime {
     data: GetDataType<K, JsonValue>,
     destination?: Destination,
   ) => Promise<GetReturnType<K, ReturnType>>;
-  onMessage: <Data extends JsonValue = JsonValue, K extends DataTypeKey = DataTypeKey>(
+  onMessage: <
+    Data extends JsonValue = JsonValue,
+    K extends DataTypeKey = DataTypeKey,
+  >(
     messageID: K,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>,
@@ -67,7 +70,7 @@ export const createEndpointRuntime = (
           if (err) {
             const dehydratedErr = err as Record<string, string>;
             // eslint-disable-next-line no-restricted-globals, @typescript-eslint/no-explicit-any
-            const errCtr = (self as { [key: string]: any })[dehydratedErr.name];
+            const errCtr = (self as {[key: string]: any})[dehydratedErr.name];
             const hydratedErr = new (
               typeof errCtr === 'function' ? errCtr : Error
             )(dehydratedErr.message);

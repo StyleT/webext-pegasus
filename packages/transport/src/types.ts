@@ -1,9 +1,8 @@
 import type {Jsonify, JsonValue} from 'type-fest';
 
-
 export interface EndpointWontRespondError {
-  type: 'error'
-  transactionID: string
+  type: 'error';
+  transactionID: string;
 }
 
 export interface QueuedMessage {
@@ -77,13 +76,13 @@ export type GetDataType<
   K extends DataTypeKey,
   Fallback extends JsonValue = null,
 > = K extends keyof ProtocolMap
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ? ProtocolMap[K] extends (...args: infer Args) => any
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ProtocolMap[K] extends (...args: infer Args) => any
     ? Args['length'] extends 0
       ? undefined
       : Args[0]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    : ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
     ? Data
     : ProtocolMap[K]
   : Fallback;
@@ -92,11 +91,11 @@ export type GetReturnType<
   K extends DataTypeKey,
   Fallback extends JsonValue = null,
 > = K extends keyof ProtocolMap
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ? ProtocolMap[K] extends (...args: any[]) => infer R
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ProtocolMap[K] extends (...args: any[]) => infer R
     ? R
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    : ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
     ? Return
     : void
   : Fallback;

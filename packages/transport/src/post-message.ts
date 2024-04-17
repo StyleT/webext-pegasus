@@ -1,48 +1,51 @@
-import type { EndpointWontRespondError, InternalMessage } from './types'
+import type {EndpointWontRespondError, InternalMessage} from './types';
 
-import { getMessagePort } from './message-port'
+import {getMessagePort} from './message-port';
 
 export const usePostMessaging = (thisContext: 'window' | 'content-script') => {
-  let allocatedNamespace: string
-  let messagingEnabled = false
+  let allocatedNamespace: string;
+  let messagingEnabled = false;
   let onMessageCallback: (
-    msg: InternalMessage | EndpointWontRespondError
-  ) => void
-  let portP: Promise<MessagePort>
+    msg: InternalMessage | EndpointWontRespondError,
+  ) => void;
+  let portP: Promise<MessagePort>;
 
   return {
     enable: () => (messagingEnabled = true),
     onMessage: (cb: typeof onMessageCallback) => (onMessageCallback = cb),
-    postMessage: async(msg: InternalMessage | EndpointWontRespondError) => {
-      if (thisContext !== 'content-script' && thisContext !== 'window')
-        {throw new Error('Endpoint does not use postMessage')}
+    postMessage: async (msg: InternalMessage | EndpointWontRespondError) => {
+      if (thisContext !== 'content-script' && thisContext !== 'window') {
+        throw new Error('Endpoint does not use postMessage');
+      }
 
-      if (!messagingEnabled)
-        {throw new Error('Communication with window has not been allowed')}
+      if (!messagingEnabled) {
+        throw new Error('Communication with window has not been allowed');
+      }
 
-      ensureNamespaceSet(allocatedNamespace)
+      ensureNamespaceSet(allocatedNamespace);
 
-      return (await portP).postMessage(msg)
+      return (await portP).postMessage(msg);
     },
     setNamespace: (nsps: string) => {
-      if (allocatedNamespace)
-        {throw new Error('Namespace once set cannot be changed')}
+      if (allocatedNamespace) {
+        throw new Error('Namespace once set cannot be changed');
+      }
 
-      allocatedNamespace = nsps
-      portP = getMessagePort(thisContext, nsps, ({ data }) =>
+      allocatedNamespace = nsps;
+      portP = getMessagePort(thisContext, nsps, ({data}) =>
         onMessageCallback?.(data),
-      )
+      );
     },
-  }
-}
+  };
+};
 
 function ensureNamespaceSet(namespace: string) {
   if (typeof namespace !== 'string' || namespace.trim().length === 0) {
     throw new Error(
-      'pegasus-transport uses window.postMessage to talk with other "window"(s) for message routing'
-        + 'which is global/conflicting operation in case there are other scripts using pegasus-transport. '
-        + 'Call Bridge#setNamespace(nsps) to isolate your app. Example: setNamespace(\'com.facebook.react-devtools\'). '
-        + 'Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`',
-    )
+      'pegasus-transport uses window.postMessage to talk with other "window"(s) for message routing' +
+        'which is global/conflicting operation in case there are other scripts using pegasus-transport. ' +
+        "Call Bridge#setNamespace(nsps) to isolate your app. Example: setNamespace('com.facebook.react-devtools'). " +
+        'Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`',
+    );
   }
 }
