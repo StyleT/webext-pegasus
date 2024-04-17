@@ -1,6 +1,6 @@
 {
   "name": "@webext-pegasus/store",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A set of utilities for building Redux/Zustand/Mobx/etc applications in Web Extensions.",
   "keywords": [
     "chrome",
@@ -52,8 +52,8 @@
   },
   "homepage": "https://github.com/StyleT/webext-pegasus#readme",
   "dependencies": {
-    "@webext-pegasus/rpc": "^0.0.3",
-    "@webext-pegasus/transport": "^0.0.3",
+    "@webext-pegasus/rpc": "^0.0.4",
+    "@webext-pegasus/transport": "^0.0.4",
     "type-fest": "^0.21.3"
   }
 }
