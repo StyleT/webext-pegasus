@@ -1,6 +1,6 @@
 {
   "name": "@webext-pegasus/rpc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "RPC Messaging in Web Extensions made easy and type safe. Out of the box.",
   "keywords": [
     "chrome",
@@ -52,7 +52,7 @@
   },
   "homepage": "https://github.com/StyleT/webext-pegasus#readme",
   "dependencies": {
-    "type-fest": "^0.21.3",
-    "@webext-pegasus/transport": "0.0.2"
+    "@webext-pegasus/transport": "^0.0.3",
+    "type-fest": "^0.21.3"
   }
 }
