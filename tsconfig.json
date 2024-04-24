@@ -4,7 +4,7 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "jsx": "react-jsx",
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "downlevelIteration": true,
     "noEmit": true,
     "strict": true,
@@ -12,6 +12,7 @@
     "typeRoots": ["node_modules/@types"],
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
 
     "paths": {
       "@webext-pegasus/transport": ["./packages/transport/"],
@@ -20,7 +21,7 @@
       "@webext-pegasus/store-zustand": ["./packages/store-zustand/"]
     }
   },
-  "include": ["./packages"],
+  "include": ["./packages", "./test-utils"],
   "exclude": [
     "**/packages/**/src/__tests__/**",
     "**/dist/**",

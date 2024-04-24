@@ -6,13 +6,13 @@
  *
  */
 
-'use strict';
+import type {Config} from 'jest';
 
 const common = {
   modulePathIgnorePatterns: ['/npm'],
 };
 
-module.exports = {
+const config: Config = {
   projects: [
     {
       ...common,
@@ -22,16 +22,15 @@ module.exports = {
       },
       moduleNameMapper: {
         '^./dist/(.+)': './src/$1',
-        '^@webext-pegasus/rpc$': '<rootDir>/packages/rpc/src/index.ts',
-        '^@webext-pegasus/store$': '<rootDir>/packages/store/src/index.ts',
+        '^@webext-pegasus/rpc$': '<rootDir>/packages/rpc/index.ts',
+        '^@webext-pegasus/store$': '<rootDir>/packages/store/index.ts',
         '^@webext-pegasus/store-zustand$':
-          '<rootDir>/packages/store-zustand/src/index.ts',
-        '^@webext-pegasus/transport$':
-          '<rootDir>/packages/transport/src/index.ts',
-        '^@webext-pegasus/transport/(.+)$':
-          '<rootDir>/packages/transport/src/$1',
+          '<rootDir>/packages/store-zustand/index.ts',
+        '^@webext-pegasus/transport$': '<rootDir>/packages/transport/index.ts',
+        '^@webext-pegasus/transport/(.+)$': '<rootDir>/packages/transport/$1',
       },
       preset: 'ts-jest',
+      setupFilesAfterEnv: ['<rootDir>/test-utils/testPegasus.ts'],
       testEnvironment: 'jsdom',
       testMatch: ['**/__tests__/unit/**/*.test{.ts,.tsx,.js,.jsx}'],
       transform: {
@@ -46,3 +45,5 @@ module.exports = {
     },
   ],
 };
+
+export default config;

@@ -73,17 +73,4 @@ export function initPegasusStoreBackend<
   ).catch((error) => {
     console.error('Error emitting initial state event:', error);
   });
-
-  // /**
-  //  * Setup external action handler
-  //  */
-  // if (browserAPI.runtime.onMessageExternal) {
-  //   withPayloadDeserializer((...args) =>
-  //     browserAPI.runtime.onMessageExternal.addListener(...args),
-  //   )(dispatchResponse, shouldDeserialize);
-  // } else {
-  //   console.warn(
-  //     'runtime.onMessageExternal is not supported. See https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessageExternal',
-  //   );
-  // }
 }

@@ -36,14 +36,18 @@ let API: MessagingAPI | null = null;
 
 export function setMessagingAPI(api: MessagingAPI): void {
   if (API != null) {
-    throw new Error('Messaging API already set');
+    throw new Error(
+      'Messaging API already set. Likely you called "initPegasusTransport" twice in the same context.',
+    );
   }
   API = api;
 }
 
 export function getMessagingAPI(): MessagingAPI {
   if (API == null) {
-    throw new Error("Messaging API wan't set");
+    throw new Error(
+      "Messaging API wan't set. Make sure you called 'initPegasusTransport' within current context before using @webext-pegasus packages.",
+    );
   }
 
   return API;
