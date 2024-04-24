@@ -1,14 +1,10 @@
 {
-    "compilerOptions": {
-      "allowJs": true,
-      "esModuleInterop": true,
-      "strict": false
-    },
-    "include": ["./packages"],
-    "exclude": [
-      "**/dist/**",
-      "**/npm/**",
-      "**/node_modules/**",
-    ],
-    "extends": "./tsconfig.json"
-  }
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "strict": false
+  },
+  "include": ["./packages"],
+  "exclude": ["**/dist/**", "**/npm/**", "**/node_modules/**"],
+  "extends": "./tsconfig.json"
+}

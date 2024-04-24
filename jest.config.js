@@ -36,9 +36,12 @@ module.exports = {
       testMatch: ['**/__tests__/unit/**/*.test{.ts,.tsx,.js,.jsx}'],
       transform: {
         '^.+\\.jsx?$': 'babel-jest',
-        '^.+\\.tsx$': ['ts-jest', {
+        '^.+\\.tsx$': [
+          'ts-jest',
+          {
             tsconfig: 'tsconfig.test.json',
-        }],
+          },
+        ],
       },
     },
   ],
