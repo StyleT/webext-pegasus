@@ -19,8 +19,8 @@ export type PegasusStoreProps<
   A extends PegasusStoreAction = PegasusStoreAnyAction,
 > = {
   portName: string;
-  serializer: SerializerFn<S | StateDiff<S> | A>;
-  deserializer: DeserializerFn<S | StateDiff<S> | A>;
+  serializer: SerializerFn<S | StateDiff | A>;
+  deserializer: DeserializerFn<S | StateDiff | A>;
   patchStrategy?: PatchStrategyFn<S>;
   state: S;
 };
@@ -94,7 +94,7 @@ export class PegasusStore<
     onEvent<string>(
       `pegasusStore/${portName}/${MessageType.PATCH_STATE}`,
       (serializedDiff) => {
-        this.patchState(deserializer(serializedDiff) as StateDiff<S>);
+        this.patchState(deserializer(serializedDiff) as StateDiff);
       },
     );
 
@@ -133,7 +133,7 @@ export class PegasusStore<
    * Replaces the state for only the keys in the updated state. Notifies all listeners of state change.
    * @param {object} state the new (partial) redux state
    */
-  patchState(difference: StateDiff<S>): void {
+  patchState(difference: StateDiff): void {
     this.state = this.patchStrategy(this.state, difference);
     this.listeners.forEach((l) => l());
   }

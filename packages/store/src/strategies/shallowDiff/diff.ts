@@ -11,12 +11,12 @@ import {ChangeType} from '../constants';
  *   The change is either `updated`, which is if the value has changed or been added,
  *   or `removed`.
  */
-export default function shallowDiff<S>(oldObj: S, newObj: S): StateDiff<S> {
+export function shallowDiff<S>(oldObj: S, newObj: S): StateDiff {
   if (!isValidState(oldObj) || !isValidState(newObj)) {
     throw new Error('shallowDiff can only diff valid state objects');
   }
 
-  const difference: StateDiff<S> = [];
+  const difference: StateDiff = [];
 
   Object.keys(newObj).forEach((key) => {
     if (oldObj[key] !== newObj[key]) {

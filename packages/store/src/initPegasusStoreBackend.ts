@@ -3,7 +3,7 @@ import {getMessagingAPI} from '@webext-pegasus/transport';
 
 import {MessageType} from './constants';
 import {StoreCommunicationBridge} from './StoreCommunicationBridge';
-import shallowDiff from './strategies/shallowDiff/diff';
+import {shallowDiff} from './strategies/shallowDiff/diff';
 import {
   DeserializerFn,
   DiffStrategyFn,
@@ -19,7 +19,7 @@ export type PegasusStoreBackendProps<
   A extends PegasusStoreAction = PegasusStoreAnyAction,
 > = {
   portName: string;
-  serializer: SerializerFn<S | StateDiff<S> | A>;
+  serializer: SerializerFn<S | StateDiff | A>;
   deserializer: DeserializerFn<A>;
   diffStrategy?: DiffStrategyFn<S>;
 };

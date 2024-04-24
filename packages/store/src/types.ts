@@ -10,15 +10,15 @@ export type StoreMessage<T> = {
   type: MessageType;
 };
 
-export type StateDiff<S> = Array<{
+export type StateDiff = Array<{
   change: ChangeType;
   key: string;
-  value?: S | undefined;
+  value?: unknown;
 }>;
 
-export type DiffStrategyFn<S> = (oldObj: S, newObj: S) => StateDiff<S>;
+export type DiffStrategyFn<S> = (oldObj: S, newObj: S) => StateDiff;
 
-export type PatchStrategyFn<S> = (obj: S, difference: StateDiff<S>) => S;
+export type PatchStrategyFn<S> = (obj: S, difference: StateDiff) => S;
 
 /**
  * An *action* is a plain object that represents an intention to change the

@@ -24,7 +24,10 @@
     "prettier:fix": "prettier --write .",
     "link": "npm link --workspaces",
     "bump-version": "lerna version",
-    "publish": "npm publish --workspaces --access public"
+    "publish": "npm publish --workspaces --access public",
+    "test:unit": "jest --selectProjects unit --testPathPattern",
+    "test:unit:watch": "npm run test-unit -- --watch --coverage=''",
+    "test:unit:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --collectCoverage=false"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.24.1",

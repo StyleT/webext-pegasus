@@ -1,7 +1,7 @@
 import {StateDiff} from '../../types';
 import {ChangeType} from '../constants';
 
-export function shallowPatch<S>(obj: S, difference: StateDiff<S>): S {
+export function shallowPatch<S>(obj: S, difference: StateDiff): S {
   const newObj: {[key: string]: unknown} = Object.assign({}, obj);
 
   difference.forEach(({change, key, value}) => {

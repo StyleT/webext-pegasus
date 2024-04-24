@@ -50,3 +50,6 @@ jobs:
 
       - name: Checking typings
         run: npm run tsc
+
+      - name: Running unit tests
+        run: npm run test:unit
