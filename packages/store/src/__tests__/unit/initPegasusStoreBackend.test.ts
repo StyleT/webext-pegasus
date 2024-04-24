@@ -46,7 +46,10 @@ describe('initPegasusStoreBackend', () => {
 
       sendMessage(
         getMessageKey(`PegasusStoreCommunicationBridgeFor-${portName}`),
-        payload,
+        {
+          args: [payload],
+          path: 'dispatch',
+        },
       );
 
       expect(dispatch.mock.calls).toHaveLength(1);
@@ -68,7 +71,10 @@ describe('initPegasusStoreBackend', () => {
       expect(
         await sendMessage(
           getMessageKey(`PegasusStoreCommunicationBridgeFor-${portName}`),
-          testPayload,
+          {
+            args: [testPayload],
+            path: 'dispatch',
+          },
         ),
       ).toEqual(serializer(payload));
 
