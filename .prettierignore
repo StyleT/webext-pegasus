@@ -12,3 +12,4 @@ packages/**/vite.prod.config.js
 .ts-temp
 .github/CODEOWNERS
 .prettierignore
+/coverage

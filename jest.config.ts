@@ -13,6 +13,9 @@ const common = {
 };
 
 const config: Config = {
+  collectCoverageFrom: ['<rootDir>/packages/**/*.{ts,tsx}'],
+  coveragePathIgnorePatterns: ['node_modules', 'dist', '__tests__'],
+  coverageReporters: ['lcov', ['text', {skipFull: true}]],
   projects: [
     {
       ...common,

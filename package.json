@@ -26,6 +26,7 @@
     "bump-version": "lerna version",
     "publish": "npm publish --workspaces --access public",
     "test:unit": "jest --selectProjects unit --testPathPattern",
+    "test:unit:coverage": "npm run test:unit -- --collect-coverage",
     "test:unit:watch": "npm run test-unit -- --watch --coverage=''",
     "test:unit:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --collectCoverage=false"
   },

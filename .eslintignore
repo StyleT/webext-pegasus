@@ -13,3 +13,4 @@
 .ts-temp
 **/.docusaurus
 /playwright-report
+/coverage
