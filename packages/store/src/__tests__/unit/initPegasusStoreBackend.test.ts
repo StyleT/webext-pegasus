@@ -3,6 +3,7 @@ import {randomUUID} from 'crypto';
 
 import {
   addPegasusEventHandler,
+  resetPegasus,
   sendMessage,
 } from '../../../../../test-utils/testPegasus';
 import {getMessageKey} from '../../../../rpc/src/utils/getMessageKey';
@@ -13,6 +14,12 @@ import {Dispatch, IPegasusStore} from '../../types';
 
 describe('initPegasusStoreBackend', () => {
   const noop = <T>(payload: T): T => payload;
+  let portName: string;
+
+  beforeEach(() => {
+    resetPegasus();
+    portName = randomUUID();
+  });
 
   describe('on receiving messages', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,8 +42,12 @@ describe('initPegasusStoreBackend', () => {
       };
     });
 
-    it('should dispatch actions received on onMessage to store', function () {
-      const portName = randomUUID();
+    it('should dispatch actions received on onMessage to store', async function () {
+      // Mocking PegasusStore event handler
+      addPegasusEventHandler(
+        `pegasusStore/${portName}/${MessageType.STATE}`,
+        () => {},
+      );
 
       initPegasusStoreBackend(store, {
         deserializer: noop,
@@ -44,9 +55,12 @@ describe('initPegasusStoreBackend', () => {
         serializer: noop,
       });
 
-      sendMessage(
+      await sendMessage(
         getMessageKey(`PegasusStoreCommunicationBridgeFor-${portName}`),
-        payload,
+        {
+          args: [payload],
+          path: 'dispatch',
+        },
       );
 
       expect(dispatch.mock.calls).toHaveLength(1);
@@ -54,9 +68,14 @@ describe('initPegasusStoreBackend', () => {
     });
 
     it('should deserialize incoming messages correctly', async function () {
-      const portName = randomUUID();
       const deserializer = JSON.parse;
       const serializer = JSON.stringify;
+
+      // Mocking PegasusStore event handler
+      addPegasusEventHandler(
+        `pegasusStore/${portName}/${MessageType.STATE}`,
+        () => {},
+      );
 
       initPegasusStoreBackend(store, {
         deserializer,
@@ -68,7 +87,10 @@ describe('initPegasusStoreBackend', () => {
       expect(
         await sendMessage(
           getMessageKey(`PegasusStoreCommunicationBridgeFor-${portName}`),
-          testPayload,
+          {
+            args: [testPayload],
+            path: 'dispatch',
+          },
         ),
       ).toEqual(serializer(payload));
 
@@ -82,7 +104,6 @@ describe('initPegasusStoreBackend', () => {
   });
 
   it('should serialize initial state and subsequent patches correctly', function () {
-    const portName = randomUUID();
     const onEventInitHandler = jest.fn();
     addPegasusEventHandler(
       `pegasusStore/${portName}/${MessageType.STATE}`,
@@ -157,7 +178,6 @@ describe('initPegasusStoreBackend', () => {
   });
 
   it("should not send patches if state hasn't been changed", function () {
-    const portName = randomUUID();
     const onEventPatchHandler = jest.fn();
     addPegasusEventHandler(
       `pegasusStore/${portName}/${MessageType.PATCH_STATE}`,
@@ -191,6 +211,12 @@ describe('initPegasusStoreBackend', () => {
 
     const serializer = noop;
     const deserializer = noop;
+
+    // Mocking PegasusStore event handler
+    addPegasusEventHandler(
+      `pegasusStore/${portName}/${MessageType.STATE}`,
+      () => {},
+    );
 
     initPegasusStoreBackend(store, {
       deserializer,

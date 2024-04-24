@@ -22,7 +22,7 @@ export type PegasusStoreProps<
   serializer: SerializerFn<S | StateDiff | A>;
   deserializer: DeserializerFn<S | StateDiff | A>;
   patchStrategy?: PatchStrategyFn<S>;
-  state: S;
+  state?: S;
 };
 
 export class PegasusStore<

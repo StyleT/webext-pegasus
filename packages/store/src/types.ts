@@ -39,7 +39,7 @@ export type PatchStrategyFn<S> = (obj: S, difference: StateDiff) => S;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface PegasusStoreAction<T = any> {
-  type?: T;
+  type: T;
 }
 
 /**

@@ -1,6 +1,5 @@
 import type {BridgeMessage, OnMessageCallback} from '../packages/transport';
 
-import {jest} from '@jest/globals';
 import {JsonValue} from 'type-fest';
 
 import {
@@ -20,13 +19,22 @@ const listeners: {
 
 const messagingAPI: MessagingAPI = {
   emitEvent: async (eventID: string, message: JsonValue): Promise<void> => {
+    let sent = false;
     listeners.onEvent.forEach(([eventIDToCheck, cb]) => {
       if (eventIDToCheck === eventID) {
         cb(message);
+        sent = true;
       }
     });
+
+    if (!sent) {
+      throw new Error(`No listener found for eventID: ${eventID}`);
+    }
   },
-  onEvent: (messageID, fn) => {
+  onEvent: <M extends JsonValue>(
+    messageID: string,
+    fn: (message: M) => void,
+  ) => {
     listeners.onEvent.push([messageID, fn]);
 
     return () => {
@@ -46,46 +54,43 @@ const messagingAPI: MessagingAPI = {
       }
     };
   },
-  sendMessage: jest.fn(() => Promise.resolve()),
+  sendMessage: async <RT = unknown>(
+    messageID: string,
+    payload: JsonValue,
+  ): Promise<RT> => {
+    const message: BridgeMessage<object> = {
+      data: payload as object,
+      id: '1',
+      sender: {
+        context: 'window',
+        tabId: 1,
+      },
+      timestamp: Date.now(),
+    };
+
+    const relatedListeners = listeners.onMessage.filter(
+      ([mID]) => mID === messageID,
+    );
+
+    if (relatedListeners.length > 1) {
+      throw new Error(`Found more then 1 listener for messageID: ${messageID}`);
+    }
+    if (relatedListeners.length === 0) {
+      throw new Error(`No listener found for messageID: ${messageID}`);
+    }
+    const [, cb] = relatedListeners[0];
+
+    return cb(message) as RT;
+  },
 };
 
 setMessagingAPI(messagingAPI);
 
-export function addPegasusEventHandler(
-  messageID: string,
-  fn: (message: unknown) => void,
-): () => void {
-  return messagingAPI.onEvent(messageID, fn);
-}
-
-export async function sendMessage<RT = unknown>(
-  messageID: string,
-  payload: JsonValue,
-): Promise<RT> {
-  const message: BridgeMessage<object> = {
-    data: {
-      args: [payload],
-      path: 'dispatch',
-    },
-    id: '1',
-    sender: {
-      context: 'window',
-      tabId: 1,
-    },
-    timestamp: Date.now(),
-  };
-
-  const relatedListeners = listeners.onMessage.filter(
-    ([mID]) => mID === messageID,
-  );
-
-  if (relatedListeners.length > 1) {
-    throw new Error(`Found more then 1 listener for messageID: ${messageID}`);
-  }
-  if (relatedListeners.length === 0) {
-    throw new Error(`No listener found for messageID: ${messageID}`);
-  }
-  const [, cb] = relatedListeners[0];
-
-  return cb(message) as RT;
+export const addPegasusEventHandler = messagingAPI.onEvent;
+export const addPegasusMessageHandler = messagingAPI.onMessage;
+export const sendMessage = messagingAPI.sendMessage;
+export const emitEvent = messagingAPI.emitEvent;
+export function resetPegasus() {
+  listeners.onEvent = [];
+  listeners.onMessage = [];
 }

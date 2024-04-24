@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "target": "ESNext",
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "jsx": "react-jsx",
@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-
+    "noImplicitAny": true,
     "paths": {
       "@webext-pegasus/transport": ["./packages/transport/"],
       "@webext-pegasus/rpc": ["./packages/rpc/"],
@@ -22,12 +22,7 @@
     }
   },
   "include": ["./packages", "./test-utils"],
-  "exclude": [
-    "**/packages/**/src/__tests__/**",
-    "**/dist/**",
-    "**/npm/**",
-    "**/node_modules/**"
-  ],
+  "exclude": ["**/dist/**", "**/npm/**", "**/node_modules/**"],
   "typedocOptions": {
     "logLevel": "Verbose"
   },
