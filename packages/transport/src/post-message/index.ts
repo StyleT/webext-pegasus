@@ -1,5 +1,4 @@
-import type {InternalMessage} from '../types';
-import type {EndpointWontRespondError} from '../types-internal';
+import type {EndpointWontRespondError, InternalPacket} from '../types-internal';
 
 import {getMessagePort} from './message-port';
 
@@ -11,14 +10,14 @@ export const usePostMessaging = (thisContext: 'window' | 'content-script') => {
   let allocatedNamespace: string;
   let messagingEnabled = false;
   let onMessageCallback: (
-    msg: InternalMessage | EndpointWontRespondError,
+    msg: InternalPacket | EndpointWontRespondError,
   ) => void;
   let portP: Promise<MessagePort>;
 
   return {
     enable: () => (messagingEnabled = true),
     onMessage: (cb: typeof onMessageCallback) => (onMessageCallback = cb),
-    postMessage: async (msg: InternalMessage | EndpointWontRespondError) => {
+    postMessage: async (msg: InternalPacket | EndpointWontRespondError) => {
       if (thisContext !== 'content-script' && thisContext !== 'window') {
         throw new Error('Endpoint does not use postMessage');
       }

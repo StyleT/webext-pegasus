@@ -27,19 +27,7 @@ export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (
   message: PegasusMessage<T>,
 ) => R | Promise<R>;
 
-export interface InternalMessage {
-  origin: Endpoint;
-  destination: Endpoint;
-  transactionId: string;
-  hops: string[];
-  messageID: string;
-  messageType: 'message' | 'reply';
-  err?: JsonValue;
-  data?: JsonValue | void;
-  timestamp: number;
-}
-
-export interface TransportAPI {
+export interface TransportMessagingAPI {
   /**
    * Sends a message to some other part of your extension.
    *
@@ -66,6 +54,9 @@ export interface TransportAPI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>,
   ) => () => void;
+}
+
+export interface TransportBroadcastEventAPI {
   /**
    * Broadcast Channel API alternative for browser extensions
    * Allows basic communication between extension contexts (that is, windows, popups, devtools, content-scripts, background, etc...)
@@ -85,6 +76,8 @@ export interface TransportAPI {
     data: Data,
   ) => Promise<void>;
 }
+
+export interface TransportAPI extends TransportMessagingAPI, TransportBroadcastEventAPI {}
 
 declare const ProtocolWithReturnSymbol: unique symbol;
 

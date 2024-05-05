@@ -1,13 +1,12 @@
 import type {RequestMessage} from './src/PortMessage';
-import type {InternalMessage} from './src/types';
-import type {InternalBroadcastEvent} from './src/types-internal';
+import type {InternalBroadcastEvent, InternalMessage} from './src/types-internal';
 import type {DeliveryReceipt} from './src/utils/delivery-logger';
 import type {EndpointFingerprint} from './src/utils/endpoint-fingerprint';
-import type {JsonValue} from 'type-fest';
 import type {Runtime} from 'webextension-polyfill';
 
 import browser from 'webextension-polyfill';
 
+import { createBroadcastEventRuntime } from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {PortMessage} from './src/PortMessage';
 import {initTransportAPI} from './src/TransportAPI';
@@ -151,10 +150,10 @@ export function initPegasusTransport(): void {
 
   const messageRuntime = createMessageRuntime(
     'background',
-    (message) => {
+    async (message) => {
       if (
         message.origin.context === 'background' &&
-        ['content-script', 'devtools '].includes(message.destination.context) &&
+        ['content-script', 'devtools'].includes(message.destination.context) &&
         !message.destination.tabId
       ) {
         throw new TypeError(
@@ -202,7 +201,7 @@ export function initPegasusTransport(): void {
         }
 
         if (message.messageType === 'reply') {
-          pendingResponses.remove(message.messageID);
+          pendingResponses.remove(message.id);
         }
 
         if (sender()) {
@@ -226,7 +225,7 @@ export function initPegasusTransport(): void {
         }
       }
     },
-    (message) => {
+    async (message) => {
       const resolvedSender = serializeEndpoint({
         ...message.origin,
         ...(message.origin.context === 'window' && {context: 'content-script'}),
@@ -350,39 +349,33 @@ export function initPegasusTransport(): void {
     });
   });
 
-  initTransportAPI({
-    emitBroadcastEvent: async <Message extends JsonValue>(
-      eventID: string,
-      message: Message,
-    ): Promise<void> => {
-      const messageData: InternalBroadcastEvent<Message> = {
-        data: message,
-        eventID,
-        messageType: 'PegasusEvent',
-        sender: {
-          context: 'background',
-          tabId: null,
-        },
-        timestamp: Date.now(),
-      };
-
-      try {
-        await browser.runtime.sendMessage(messageData);
-        const tabs = await browser.tabs.query({});
-        for (const tab of tabs) {
-          if (tab.id) {
-            await browser.tabs.sendMessage(tab.id, messageData);
-          }
+  const eventRuntime = createBroadcastEventRuntime('background', async (event) => {
+    try {
+      await browser.runtime.sendMessage(event);
+      const tabs = await browser.tabs.query({});
+      for (const tab of tabs) {
+        if (tab.id) {
+          await browser.tabs.sendMessage(tab.id, event);
         }
-      } catch (e) {
-        // do nothing - errors can be present
-        // if no content script exists on receiver
-        console.warn('Suppressed error:', e);
       }
-    },
-    onBroadcastEvent: () => {
-      throw new Error('Not implemented yet');
-    },
+    } catch (e) {
+      // do nothing - errors can be present
+      // if no content script exists on receiver
+      console.warn('Suppressed error:', e);
+    }
+
+    // So background listeners receive events from other contexts
+    eventRuntime.handleEvent(event);
+  });
+  browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
+    if (message.messageType === 'broadcastEvent') {
+      eventRuntime.handleEvent(message);
+    }
+  });
+
+  initTransportAPI({
+    emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,
     sendMessage: messageRuntime.sendMessage,
   });

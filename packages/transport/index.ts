@@ -3,7 +3,6 @@ export {getTransportAPI} from './src/TransportAPI';
 export {
   Destination,
   Endpoint,
-  InternalMessage,
   OnMessageCallback,
   PegasusMessage,
   ProtocolMap,

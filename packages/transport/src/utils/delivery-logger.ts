@@ -1,4 +1,4 @@
-import type {InternalMessage} from '../types';
+import type {InternalMessage} from '../types-internal';
 import type {EndpointFingerprint} from './endpoint-fingerprint';
 
 export interface DeliveryReceipt {

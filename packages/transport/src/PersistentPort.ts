@@ -1,5 +1,5 @@
 import type {StatusMessage} from './PortMessage';
-import type {InternalMessage} from './types';
+import type {InternalMessage} from './types-internal';
 import type {Runtime} from 'webextension-polyfill';
 
 import browser from 'webextension-polyfill';
@@ -38,7 +38,7 @@ export const createPersistentPort = (name = '') => {
       case 'undeliverable':
         if (
           !undeliveredQueue.some(
-            (m) => m.message.messageID === msg.message.messageID,
+            (m) => m.message.id === msg.message.id,
           )
         ) {
           undeliveredQueue = [
@@ -77,7 +77,7 @@ export const createPersistentPort = (name = '') => {
 
       case 'incoming':
         if (msg.message.messageType === 'reply') {
-          pendingResponses.remove(msg.message.messageID);
+          pendingResponses.remove(msg.message.id);
         }
 
         onMessageListeners.forEach((cb) => cb(msg.message, msgPort));

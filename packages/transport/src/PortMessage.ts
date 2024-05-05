@@ -1,4 +1,4 @@
-import type {InternalMessage} from './types';
+import type {InternalMessage} from './types-internal';
 import type {DeliveryReceipt} from './utils/delivery-logger';
 import type {EndpointFingerprint} from './utils/endpoint-fingerprint';
 import type {Runtime} from 'webextension-polyfill';
