@@ -6,7 +6,16 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/StyleT/webext-pegasus/ci.yml?branch=main)
 [![Package version](https://badgen.net/npm/v/@webext-pegasus%2Ftransport)](https://www.npmjs.com/package/@webext-pegasus/transport)
 
-Turns surface specific browser APIs into unified transport layer.
+**Sending messages and events in web extensions has never been easier. Batteries included 🔋🔋🔋**
+
+Turns surface specific browser APIs into unified transport layer. So you can seamlessly communicate between all extension contexts (including injected script/window). Promotes code reusability by enabling reuse of the components that rely on messages/events between dfferent extension contexts.
+
+No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `window.dispatchEvent`
+
+This library provides two communication patterns:
+
+- **One-on-one messaging with optional replies** – via `sendMessage` and `onMessage` APIs. Resilient way of communication between any 2 contexts. Ex: DevTools panel and injected script within instected tab.
+- **Event broadcasting** – via `emitBroadcastEvent` and `onBroadcastEvent`. This allows you to inform other extension contexts about certains events. Ex: broadcast changes to all open tabs
 
 ## Supports
 
@@ -20,11 +29,10 @@ Turns surface specific browser APIs into unified transport layer.
 npm install -S @webext-pegasus/transport
 ```
 
-Initialize Pegasus transport layer **once** for every runtime context you use in your extension.
-
-`background.ts`
+Initialize Pegasus transport layer **once for every runtime context** you use in your extension.
 
 ```typescript
+// background.ts
 import { initPegasusTransport } from '@webext-pegasus/transport/background';
 
 initPegasusTransport();
@@ -36,8 +44,13 @@ As soon as Pegasus Transport was initialized - all other code that relies on tra
 ```typescript
 import {getTransportAPI} from '@webext-pegasus/transport';
 
-// This will work in any runtime context as initPegasusTransport() set needed adapter within module lexical scope
-const {sendMessage} = getTransportAPI();
+// This will work in any runtime context as initPegasusTransport() set needed adapter within module's lexical scope
+const {
+  sendMessage,
+  onMessage,
+  emitBroadcastEvent,
+  onBroadcastEvent
+} = getTransportAPI();
 sendMessage(/* ... */);
 ```
 
@@ -49,6 +62,46 @@ sendMessage(/* ... */);
  - `@webext-pegasus/transport/popup`
  - `@webext-pegasus/transport/window` (for injected scripts)
 
+ ## Comparison to other libraries
+
+ | | `@webext-pegasus/transport` | `webext-bridge` |
+ | - | - | - |
+ | One-on-one messaging | ✅ | ✅ |
+ | Event Broadcasting | ✅ | ❌ |
+ | Context agnostic APIs | ✅ | ❌ |
+ | Type Safety | ✅ | 🌦️ |
+
+## Troubleshooting
+
+- **Doesn't work?**
+
+  If `window` contexts are not part of the puzzle, it shall out of the box for messaging between `devtools` <-> `background` <-> `content-script`(s). If even that is not working, it's likely that `@webext-pegasus/transport` hasn't been initialized in `background` page of your extension, which is used as a relay for all events/messages. If you don't need a background page for yourself, here's bare minimum to get Pegasus flying.
+
+```javascript
+// background.js (requires transpilation/bundling using webpack(recommended))
+
+import { initPegasusTransport } from '@webext-pegasus/transport/background';
+initPegasusTransport();
+```
+
+```javascript
+// manifest.json
+
+{
+  "background": {
+    "scripts": ["path/to/transpiled/background.js"]
+  }
+}
+```
+
+
+- **Can't send messages to / receive from `window`?**
+
+  Sending or receiving messages from or to `window` requires you to open the messaging gateway in content script(s) for that particular tab. Call `initPegasusTransport({allowWindowMessagingForNamespace: '...'})` while passing `allowWindowMessagingForNamespace` option in any of your content script(s) in that tab and call `initPegasusTransport({namespace: '...'})` in the
+  script loaded in top frame i.e the `window` context. Make sure that `namespaceA === namespaceB`. If you're doing this, read the [security note below](#security)
+
+
+<a name="security"></a>
 
 ## Security risks while communicating with injected script
 
