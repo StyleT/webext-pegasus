@@ -1,11 +1,11 @@
 import type {
-  BridgeMessage,
   DataTypeKey,
   Destination,
   GetDataType,
   GetReturnType,
   InternalMessage,
   OnMessageCallback,
+  PegasusMessage,
   RuntimeContext,
 } from './types';
 import type {JsonValue} from 'type-fest';
@@ -13,9 +13,9 @@ import type {JsonValue} from 'type-fest';
 import {serializeError} from 'serialize-error';
 import uuid from 'tiny-uid';
 
-import {parseEndpoint} from './endpoint';
+import {deserializeEndpoint} from './utils/endpoint-utils';
 
-export interface EndpointRuntime {
+export interface MessageRuntime {
   sendMessage: <
     ReturnType extends JsonValue,
     K extends DataTypeKey = DataTypeKey,
@@ -39,11 +39,11 @@ export interface EndpointRuntime {
   endTransaction: (transactionID: string) => void;
 }
 
-export const createEndpointRuntime = (
+export const createMessageRuntime = (
   thisContext: RuntimeContext,
   routeMessage: (msg: InternalMessage) => void,
   localMessage?: (msg: InternalMessage) => void,
-): EndpointRuntime => {
+): MessageRuntime => {
   const runtimeId = uuid();
   const openTransactions = new Map<
     string,
@@ -101,7 +101,7 @@ export const createEndpointRuntime = (
               id: messageID,
               sender: message.origin,
               timestamp: message.timestamp,
-            } as BridgeMessage<JsonValue>);
+            } as PegasusMessage<JsonValue>);
           } else {
             noHandlerFoundError = true;
             throw new Error(
@@ -159,7 +159,7 @@ export const createEndpointRuntime = (
     sendMessage: (messageID, data, destination = 'background') => {
       const endpoint =
         typeof destination === 'string'
-          ? parseEndpoint(destination)
+          ? deserializeEndpoint(destination)
           : destination;
       const errFn = 'Bridge#sendMessage ->';
 

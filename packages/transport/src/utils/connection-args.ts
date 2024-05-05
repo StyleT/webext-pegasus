@@ -13,6 +13,9 @@ const isValidConnectionArgs = (
   args !== null &&
   requiredKeys.every((k) => k in args);
 
+/**
+ * Used within "persistent-port" to encode connection args for the background script
+ */
 export const encodeConnectionArgs = (args: ConnectionArgs) => {
   if (!isValidConnectionArgs(args)) {
     throw new TypeError('Invalid connection args');
@@ -21,6 +24,9 @@ export const encodeConnectionArgs = (args: ConnectionArgs) => {
   return JSON.stringify(args);
 };
 
+/**
+ * Used by background script to decode connection args passed by other extension contexts
+ */
 export const decodeConnectionArgs = (
   encodedArgs: string,
 ): ConnectionArgs | null => {

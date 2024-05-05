@@ -1,7 +1,12 @@
-import type {EndpointWontRespondError, InternalMessage} from './types';
+import type {InternalMessage} from '../types';
+import type {EndpointWontRespondError} from '../types-internal';
 
 import {getMessagePort} from './message-port';
 
+/**
+ * Used for communication between content-script and window contexts.
+ * It leverages Channel Messaging API to establish two-way communication channel
+ */
 export const usePostMessaging = (thisContext: 'window' | 'content-script') => {
   let allocatedNamespace: string;
   let messagingEnabled = false;
@@ -44,7 +49,8 @@ function ensureNamespaceSet(namespace: string) {
     throw new Error(
       'pegasus-transport uses window.postMessage to talk with other "window"(s) for message routing' +
         'which is global/conflicting operation in case there are other scripts using pegasus-transport. ' +
-        "Call Bridge#setNamespace(nsps) to isolate your app. Example: setNamespace('com.facebook.react-devtools'). " +
+        'Call initPegasusTransport({namespace}) (in window) or initPegasusTransport({allowWindowMessagingForNamespace}) (in content-script) to isolate your app. ' +
+        "Example: setNamespace('com.facebook.react-devtools'). " +
         'Make sure to use same namespace across all your scripts whereever window.postMessage is likely to be used`',
     );
   }

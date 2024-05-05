@@ -1,15 +1,5 @@
 import type {Jsonify, JsonValue} from 'type-fest';
 
-export interface EndpointWontRespondError {
-  type: 'error';
-  transactionID: string;
-}
-
-export interface QueuedMessage {
-  resolvedDestination: string;
-  message: InternalMessage;
-}
-
 export type RuntimeContext =
   | 'devtools'
   | 'background'
@@ -24,7 +14,9 @@ export interface Endpoint {
   frameId?: number;
 }
 
-export interface BridgeMessage<T extends JsonValue> {
+export type Destination = Endpoint | RuntimeContext | string;
+
+export interface PegasusMessage<T extends JsonValue> {
   sender: Endpoint;
   id: string;
   data: T;
@@ -32,7 +24,7 @@ export interface BridgeMessage<T extends JsonValue> {
 }
 
 export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (
-  message: BridgeMessage<T>,
+  message: PegasusMessage<T>,
 ) => R | Promise<R>;
 
 export interface InternalMessage {
@@ -47,7 +39,52 @@ export interface InternalMessage {
   timestamp: number;
 }
 
-export type Destination = Endpoint | RuntimeContext | string;
+export interface TransportAPI {
+  /**
+   * Sends a message to some other part of your extension.
+   *
+   * Notes:
+   * - If there is no listener on the other side an error will be thrown where sendMessage was called.
+   * - Listener on the other may want to reply. Get the reply by awaiting the returned Promise
+   * - An error thrown in listener callback (in the destination context) will behave as usual, that is, bubble up, but the same error will also be thrown where sendMessage was called
+   * - If the listener receives the message but the destination disconnects (tab closure for exmaple) before responding, sendMessage will throw an error in the sender context.
+   */
+  sendMessage: <
+    ReturnType extends JsonValue,
+    K extends DataTypeKey = DataTypeKey,
+  >(
+    messageID: K,
+    data: GetDataType<K, JsonValue>,
+    destination?: Destination,
+  ) => Promise<GetReturnType<K, ReturnType>>;
+  /**
+   * Register one and only one listener, per messageId per context. That will be called upon sendMessage from other side.
+   * Optionally, send a response to sender by returning any value or if async a Promise.
+   */
+  onMessage: <Data extends JsonValue, K extends DataTypeKey = DataTypeKey>(
+    messageID: K,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>,
+  ) => () => void;
+  /**
+   * Broadcast Channel API alternative for browser extensions
+   * Allows basic communication between extension contexts (that is, windows, popups, devtools, content-scripts, background, etc...)
+   */
+  onBroadcastEvent: <Data extends JsonValue>(
+    eventID: string,
+    callback: (event: PegasusMessage<Data>) => void,
+  ) => () => void;
+  /**
+   * Broadcast Channel API alternative for browser extensions
+   * Allows basic communication between extension contexts (that is, windows, popups, devtools, content-scripts, background, etc...)
+   *
+   * Emits an event, which can be of any kind of serialazible Object, to "every" listener in any extension context with the same extension.
+   */
+  emitBroadcastEvent: <Data extends JsonValue>(
+    eventID: string,
+    data: Data,
+  ) => Promise<void>;
+}
 
 declare const ProtocolWithReturnSymbol: unique symbol;
 

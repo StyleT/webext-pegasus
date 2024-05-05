@@ -1,13 +1,16 @@
+import type {PegasusMessage} from './types';
+import type {InternalBroadcastEvent} from './types-internal';
 import type {JsonValue} from 'type-fest';
 
 import browser from 'webextension-polyfill';
 
-import {EventData} from './getMessagingAPI';
+const eventListeners = new Map<
+  string,
+  Array<(message: PegasusMessage<JsonValue>) => void>
+>();
+let globalCallback: ((message: InternalBroadcastEvent) => void) | null = null;
 
-const eventListeners = new Map<string, Array<(message: JsonValue) => void>>();
-let globalCallback: ((message: EventData) => void) | null = null;
-
-browser.runtime.onMessage.addListener((message: EventData) => {
+browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
   if (message.messageType !== 'PegasusEvent') {
     return;
   }
@@ -18,27 +21,32 @@ browser.runtime.onMessage.addListener((message: EventData) => {
   }
 
   for (const listener of listeners) {
-    listener(message.data);
+    listener({
+      data: message.data,
+      id: message.eventID,
+      sender: message.sender,
+      timestamp: message.timestamp,
+    });
   }
   globalCallback?.(message);
 });
 
 export function withExtensionEvents(
-  globalCallbackFn: (message: EventData) => void,
+  globalCallbackFn: (message: InternalBroadcastEvent) => void,
 ) {
-  function onEvent<Message extends JsonValue = JsonValue>(
+  function onBroadcastEvent<Data extends JsonValue>(
     eventID: string,
-    callback: (message: Message) => void,
+    callback: (message: PegasusMessage<Data>) => void,
   ): () => void {
     const listeners = eventListeners.get(eventID) ?? [];
-    listeners.push(callback as (message: JsonValue) => void);
+    listeners.push(callback as (message: PegasusMessage<JsonValue>) => void);
     eventListeners.set(eventID, listeners);
     globalCallback = globalCallbackFn;
 
     return () => {
       const existingListeners = eventListeners.get(eventID) ?? [];
       const index = existingListeners.indexOf(
-        callback as (message: JsonValue) => void,
+        callback as (message: PegasusMessage<JsonValue>) => void,
       );
       if (index !== -1) {
         existingListeners.splice(index, 1);
@@ -48,9 +56,9 @@ export function withExtensionEvents(
   }
 
   return {
-    emitEvent: () => {
+    emitBroadcastEvent: () => {
       throw new Error('Not implemented');
     },
-    onEvent,
+    onBroadcastEvent,
   };
 }

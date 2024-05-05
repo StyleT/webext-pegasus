@@ -1,8 +1,8 @@
 import browser from 'webextension-polyfill';
 
-import {createEndpointRuntime} from './src/endpoint-runtime';
-import {setMessagingAPI} from './src/getMessagingAPI';
-import {createPersistentPort} from './src/persistent-port';
+import {createMessageRuntime} from './src/MessageRuntime';
+import {createPersistentPort} from './src/PersistentPort';
+import {initTransportAPI} from './src/TransportAPI';
 import {withExtensionEvents} from './src/withExtensionEvents';
 
 const eventChannel = withExtensionEvents(() => {});
@@ -11,16 +11,16 @@ export function initPegasusTransport(): void {
   const port = createPersistentPort(
     `devtools@${browser.devtools.inspectedWindow.tabId}`,
   );
-  const endpointRuntime = createEndpointRuntime('devtools', (message) =>
+  const messageRuntime = createMessageRuntime('devtools', (message) =>
     port.postMessage(message),
   );
 
-  port.onMessage(endpointRuntime.handleMessage);
+  port.onMessage(messageRuntime.handleMessage);
 
-  setMessagingAPI({
-    emitEvent: eventChannel.emitEvent,
-    onEvent: eventChannel.onEvent,
-    onMessage: endpointRuntime.onMessage,
-    sendMessage: endpointRuntime.sendMessage,
+  initTransportAPI({
+    emitBroadcastEvent: eventChannel.emitBroadcastEvent,
+    onBroadcastEvent: eventChannel.onBroadcastEvent,
+    onMessage: messageRuntime.onMessage,
+    sendMessage: messageRuntime.sendMessage,
   });
 }

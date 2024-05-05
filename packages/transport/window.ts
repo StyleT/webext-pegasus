@@ -1,8 +1,10 @@
+import type {PegasusMessage} from './src/types';
+import type {InternalBroadcastEvent} from './src/types-internal';
 import type {JsonValue} from 'type-fest';
 
-import {createEndpointRuntime} from './src/endpoint-runtime';
-import {setMessagingAPI} from './src/getMessagingAPI';
+import {createMessageRuntime} from './src/MessageRuntime';
 import {usePostMessaging} from './src/post-message';
+import {initTransportAPI} from './src/TransportAPI';
 
 type Props = {
   namespace?: string;
@@ -11,15 +13,15 @@ type Props = {
 export function initPegasusTransport({namespace}: Props = {}): void {
   const win = usePostMessaging('window');
 
-  const endpointRuntime = createEndpointRuntime('window', (message) =>
+  const messageRuntime = createMessageRuntime('window', (message) =>
     win.postMessage(message),
   );
 
   win.onMessage((msg) => {
     if ('type' in msg && 'transactionID' in msg) {
-      endpointRuntime.endTransaction(msg.transactionID);
+      messageRuntime.endTransaction(msg.transactionID);
     } else {
-      endpointRuntime.handleMessage(msg);
+      messageRuntime.handleMessage(msg);
     }
   });
 
@@ -27,23 +29,29 @@ export function initPegasusTransport({namespace}: Props = {}): void {
     win.setNamespace(namespace);
     win.enable();
   }
-  setMessagingAPI({
-    emitEvent: () => {
+  initTransportAPI({
+    emitBroadcastEvent: () => {
       throw new Error('Not implemented');
     },
-    onEvent: initEvents(namespace),
-    onMessage: endpointRuntime.onMessage,
-    sendMessage: endpointRuntime.sendMessage,
+    onBroadcastEvent: initEvents(namespace),
+    onMessage: messageRuntime.onMessage,
+    sendMessage: messageRuntime.sendMessage,
   });
 }
 
 function initEvents(namespace: string | undefined) {
-  return function onEvent<Message extends JsonValue = JsonValue>(
+  return function onBroadcastEvent<Data extends JsonValue>(
     eventID: string,
-    callback: (message: Message) => void,
+    callback: (message: PegasusMessage<Data>) => void,
   ): () => void {
     const handleEvent = (event: CustomEvent) => {
-      callback(JSON.parse(event.detail));
+      const internalEvent: InternalBroadcastEvent = JSON.parse(event.detail);
+      callback({
+        data: internalEvent.data as Data,
+        id: internalEvent.eventID,
+        sender: internalEvent.sender,
+        timestamp: internalEvent.timestamp,
+      });
     };
     window.addEventListener(
       `pegasusEvents/${namespace}/${eventID}`,

@@ -1,6 +1,6 @@
-import type {DeliveryReceipt} from './delivery-logger';
-import type {EndpointFingerprint} from './endpoint-fingerprint';
 import type {InternalMessage} from './types';
+import type {DeliveryReceipt} from './utils/delivery-logger';
+import type {EndpointFingerprint} from './utils/endpoint-fingerprint';
 import type {Runtime} from 'webextension-polyfill';
 
 export type StatusMessage =

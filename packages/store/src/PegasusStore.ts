@@ -1,5 +1,5 @@
 import {getRPCService} from '@webext-pegasus/rpc';
-import {getMessagingAPI} from '@webext-pegasus/transport';
+import {getTransportAPI} from '@webext-pegasus/transport';
 
 import {MessageType} from './constants';
 import {IStoreCommunicationBridge} from './StoreCommunicationBridge';
@@ -59,7 +59,7 @@ export class PegasusStore<
       'background',
     );
 
-    const {onEvent} = getMessagingAPI();
+    const {onBroadcastEvent} = getTransportAPI();
 
     // We request the latest available state data to initialise our store
     this.bridge
@@ -79,10 +79,10 @@ export class PegasusStore<
 
     this.patchStrategy = patchStrategy;
 
-    onEvent<string>(
+    onBroadcastEvent<string>(
       `pegasusStore/${portName}/${MessageType.STATE}`,
-      (serializedState) => {
-        this.replaceState(deserializer(serializedState) as S);
+      (event) => {
+        this.replaceState(deserializer(event.data) as S);
 
         if (!this.readyResolved) {
           this.readyResolved = true;
@@ -91,10 +91,10 @@ export class PegasusStore<
       },
     );
 
-    onEvent<string>(
+    onBroadcastEvent<string>(
       `pegasusStore/${portName}/${MessageType.PATCH_STATE}`,
-      (serializedDiff) => {
-        this.patchState(deserializer(serializedDiff) as StateDiff);
+      (event) => {
+        this.patchState(deserializer(event.data) as StateDiff);
       },
     );
 

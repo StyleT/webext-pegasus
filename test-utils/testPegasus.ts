@@ -1,28 +1,37 @@
-import type {BridgeMessage, OnMessageCallback} from '../packages/transport';
+import type {OnMessageCallback, PegasusMessage} from '../packages/transport';
 
 import {JsonValue} from 'type-fest';
 
-import {
-  type MessagingAPI,
-  setMessagingAPI,
-} from '../packages/transport/src/getMessagingAPI';
+import {initTransportAPI} from '../packages/transport/src/TransportAPI';
+import {TransportAPI} from '../packages/transport/src/types';
 
 const listeners: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onEvent: Array<[string, (message: any) => void]>;
+  onEvent: Array<[string, event: (event: PegasusMessage<JsonValue>) => void]>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onMessage: Array<[string, OnMessageCallback<JsonValue, unknown>]>;
+  onMessage: Array<[string, OnMessageCallback<any, unknown>]>;
 } = {
   onEvent: [],
   onMessage: [],
 };
 
-const messagingAPI: MessagingAPI = {
-  emitEvent: async (eventID: string, message: JsonValue): Promise<void> => {
+const messagingAPI: TransportAPI = {
+  emitBroadcastEvent: async (
+    eventID: string,
+    message: JsonValue,
+  ): Promise<void> => {
     let sent = false;
     listeners.onEvent.forEach(([eventIDToCheck, cb]) => {
       if (eventIDToCheck === eventID) {
-        cb(message);
+        cb({
+          data: message,
+          id: eventID,
+          sender: {
+            context: 'background',
+            tabId: null,
+          },
+          timestamp: Date.now(),
+        });
         sent = true;
       }
     });
@@ -31,14 +40,17 @@ const messagingAPI: MessagingAPI = {
       throw new Error(`No listener found for eventID: ${eventID}`);
     }
   },
-  onEvent: <M extends JsonValue>(
-    messageID: string,
-    fn: (message: M) => void,
-  ) => {
-    listeners.onEvent.push([messageID, fn]);
+  onBroadcastEvent: <Data extends JsonValue>(
+    eventID: string,
+    callback: (event: PegasusMessage<Data>) => void,
+  ): (() => void) => {
+    listeners.onEvent.push([
+      eventID,
+      callback as (event: PegasusMessage<JsonValue>) => void,
+    ]);
 
     return () => {
-      const index = listeners.onEvent.findIndex(([, cb]) => cb === fn);
+      const index = listeners.onEvent.findIndex(([, cb]) => cb === callback);
       if (index >= 0) {
         listeners.onEvent.splice(index, 1);
       }
@@ -58,7 +70,7 @@ const messagingAPI: MessagingAPI = {
     messageID: string,
     payload: JsonValue,
   ): Promise<RT> => {
-    const message: BridgeMessage<object> = {
+    const message: PegasusMessage<object> = {
       data: payload as object,
       id: '1',
       sender: {
@@ -84,12 +96,12 @@ const messagingAPI: MessagingAPI = {
   },
 };
 
-setMessagingAPI(messagingAPI);
+initTransportAPI(messagingAPI);
 
-export const addPegasusEventHandler = messagingAPI.onEvent;
+export const addPegasusEventHandler = messagingAPI.onBroadcastEvent;
 export const addPegasusMessageHandler = messagingAPI.onMessage;
 export const sendMessage = messagingAPI.sendMessage;
-export const emitEvent = messagingAPI.emitEvent;
+export const emitEvent = messagingAPI.emitBroadcastEvent;
 export function resetPegasus() {
   listeners.onEvent = [];
   listeners.onMessage = [];

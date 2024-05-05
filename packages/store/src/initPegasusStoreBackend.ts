@@ -1,5 +1,5 @@
 import {registerRPCService} from '@webext-pegasus/rpc';
-import {getMessagingAPI} from '@webext-pegasus/transport';
+import {getTransportAPI} from '@webext-pegasus/transport';
 
 import {MessageType} from './constants';
 import {StoreCommunicationBridge} from './StoreCommunicationBridge';
@@ -39,7 +39,7 @@ export function initPegasusStoreBackend<
     diffStrategy = shallowDiff,
   }: PegasusStoreBackendProps<S, A>,
 ) {
-  const {emitEvent} = getMessagingAPI();
+  const {emitBroadcastEvent} = getTransportAPI();
 
   registerRPCService(
     `PegasusStoreCommunicationBridgeFor-${portName}`,
@@ -57,7 +57,7 @@ export function initPegasusStoreBackend<
       currentState = newState;
 
       // Notifying what extension is broadcasting the state changes
-      emitEvent(
+      emitBroadcastEvent(
         `pegasusStore/${portName}/${MessageType.PATCH_STATE}`,
         serializer(diff),
       ).catch((error) => {
@@ -67,7 +67,7 @@ export function initPegasusStoreBackend<
   });
 
   // Send store's initial state through port
-  emitEvent(
+  emitBroadcastEvent(
     `pegasusStore/${portName}/${MessageType.STATE}`,
     serializer(currentState),
   ).catch((error) => {

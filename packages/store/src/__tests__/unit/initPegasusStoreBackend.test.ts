@@ -107,12 +107,12 @@ describe('initPegasusStoreBackend', () => {
     const onEventInitHandler = jest.fn();
     addPegasusEventHandler(
       `pegasusStore/${portName}/${MessageType.STATE}`,
-      onEventInitHandler,
+      ({data}) => onEventInitHandler(data),
     );
     const onEventPatchHandler = jest.fn();
     addPegasusEventHandler(
       `pegasusStore/${portName}/${MessageType.PATCH_STATE}`,
-      onEventPatchHandler,
+      ({data}) => onEventPatchHandler(data),
     );
 
     // Stub state access (the first access will be on

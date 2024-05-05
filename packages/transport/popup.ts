@@ -1,22 +1,22 @@
-import {createEndpointRuntime} from './src/endpoint-runtime';
-import {setMessagingAPI} from './src/getMessagingAPI';
-import {createPersistentPort} from './src/persistent-port';
+import {createMessageRuntime} from './src/MessageRuntime';
+import {createPersistentPort} from './src/PersistentPort';
+import {initTransportAPI} from './src/TransportAPI';
 import {withExtensionEvents} from './src/withExtensionEvents';
 
 const eventChannel = withExtensionEvents(() => {});
 
 export function initPegasusTransport(): void {
   const port = createPersistentPort('popup');
-  const endpointRuntime = createEndpointRuntime('popup', (message) =>
+  const messageRuntime = createMessageRuntime('popup', (message) =>
     port.postMessage(message),
   );
 
-  port.onMessage(endpointRuntime.handleMessage);
+  port.onMessage(messageRuntime.handleMessage);
 
-  setMessagingAPI({
-    emitEvent: eventChannel.emitEvent,
-    onEvent: eventChannel.onEvent,
-    onMessage: endpointRuntime.onMessage,
-    sendMessage: endpointRuntime.sendMessage,
+  initTransportAPI({
+    emitBroadcastEvent: eventChannel.emitBroadcastEvent,
+    onBroadcastEvent: eventChannel.onBroadcastEvent,
+    onMessage: messageRuntime.onMessage,
+    sendMessage: messageRuntime.sendMessage,
   });
 }
