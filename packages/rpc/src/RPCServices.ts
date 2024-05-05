@@ -1,6 +1,6 @@
 import type {Destination, IPegasusRPCService, PegasusRPCService} from './types';
 
-import {getMessagingAPI} from '@webext-pegasus/transport';
+import {getTransportAPI} from '@webext-pegasus/transport';
 
 import {createProxy} from './utils/createProxy';
 import {getMessageKey} from './utils/getMessageKey';
@@ -27,7 +27,7 @@ export function registerRPCService<
   const messageKey = getMessageKey(serviceName);
   const pegasusService: Service = service;
 
-  const {onMessage} = getMessagingAPI();
+  const {onMessage} = getTransportAPI();
 
   onMessage(messageKey, ({data, ...message}) => {
     if (

@@ -1,26 +1,38 @@
 import browser from 'webextension-polyfill';
 
-import {createEndpointRuntime} from './src/endpoint-runtime';
-import {setMessagingAPI} from './src/getMessagingAPI';
-import {createPersistentPort} from './src/persistent-port';
-import {withExtensionEvents} from './src/withExtensionEvents';
-
-const eventChannel = withExtensionEvents(() => {});
+import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
+import {createMessageRuntime} from './src/MessageRuntime';
+import {createPersistentPort} from './src/PersistentPort';
+import {initTransportAPI} from './src/TransportAPI';
+import {InternalBroadcastEvent} from './src/types-internal';
 
 export function initPegasusTransport(): void {
   const port = createPersistentPort(
     `devtools@${browser.devtools.inspectedWindow.tabId}`,
   );
-  const endpointRuntime = createEndpointRuntime('devtools', (message) =>
+  const messageRuntime = createMessageRuntime('devtools', async (message) =>
     port.postMessage(message),
   );
 
-  port.onMessage(endpointRuntime.handleMessage);
+  port.onMessage(messageRuntime.handleMessage);
 
-  setMessagingAPI({
-    emitEvent: eventChannel.emitEvent,
-    onEvent: eventChannel.onEvent,
-    onMessage: endpointRuntime.onMessage,
-    sendMessage: endpointRuntime.sendMessage,
+  const eventRuntime = createBroadcastEventRuntime(
+    'devtools',
+    async (event) => {
+      browser.runtime.sendMessage(event);
+    },
+  );
+
+  browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
+    if (message.messageType === 'broadcastEvent') {
+      eventRuntime.handleEvent(message);
+    }
+  });
+
+  initTransportAPI({
+    emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    onBroadcastEvent: eventRuntime.onBroadcastEvent,
+    onMessage: messageRuntime.onMessage,
+    sendMessage: messageRuntime.sendMessage,
   });
 }

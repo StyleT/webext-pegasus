@@ -1,13 +1,18 @@
-import type {StatusMessage} from './port-message';
-import type {InternalMessage, QueuedMessage} from './types';
+import type {StatusMessage} from './PortMessage';
+import type {InternalMessage} from './types-internal';
 import type {Runtime} from 'webextension-polyfill';
 
 import browser from 'webextension-polyfill';
 
-import {encodeConnectionArgs} from './connection-args';
-import {createDeliveryLogger} from './delivery-logger';
-import {createFingerprint} from './endpoint-fingerprint';
-import {PortMessage} from './port-message';
+import {PortMessage} from './PortMessage';
+import {encodeConnectionArgs} from './utils/connection-args';
+import {createDeliveryLogger} from './utils/delivery-logger';
+import {createFingerprint} from './utils/endpoint-fingerprint';
+
+interface QueuedMessage {
+  resolvedDestination: string;
+  message: InternalMessage;
+}
 
 /**
  * Manfiest V3 extensions can have their service worker terminated at any point
@@ -15,6 +20,8 @@ import {PortMessage} from './port-message';
  * porta created by other parts of the extension. This class is a wrapper around the
  * built-in Port object that re-instantiates the port connection everytime it gets
  * suspended
+ *
+ * Used by extension contexts to communicate with the background script (service worker)
  */
 export const createPersistentPort = (name = '') => {
   const fingerprint = createFingerprint();
@@ -29,11 +36,7 @@ export const createPersistentPort = (name = '') => {
   const handleMessage = (msg: StatusMessage, msgPort: Runtime.Port) => {
     switch (msg.status) {
       case 'undeliverable':
-        if (
-          !undeliveredQueue.some(
-            (m) => m.message.messageID === msg.message.messageID,
-          )
-        ) {
+        if (!undeliveredQueue.some((m) => m.message.id === msg.message.id)) {
           undeliveredQueue = [
             ...undeliveredQueue,
             {
@@ -70,7 +73,7 @@ export const createPersistentPort = (name = '') => {
 
       case 'incoming':
         if (msg.message.messageType === 'reply') {
-          pendingResponses.remove(msg.message.messageID);
+          pendingResponses.remove(msg.message.id);
         }
 
         onMessageListeners.forEach((cb) => cb(msg.message, msgPort));
@@ -119,8 +122,7 @@ export const createPersistentPort = (name = '') => {
     onMessage(cb: (message: InternalMessage) => void): void {
       onMessageListeners.add(cb);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    postMessage(message: any): void {
+    postMessage(message: InternalMessage): void {
       PortMessage.toBackground(port, {
         message,
         type: 'deliver',

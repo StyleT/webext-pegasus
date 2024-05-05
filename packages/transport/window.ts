@@ -1,8 +1,12 @@
-import type {JsonValue} from 'type-fest';
+import type {
+  InternalBroadcastEvent,
+  InternalMessage,
+} from './src/types-internal';
 
-import {createEndpointRuntime} from './src/endpoint-runtime';
-import {setMessagingAPI} from './src/getMessagingAPI';
+import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
+import {createMessageRuntime} from './src/MessageRuntime';
 import {usePostMessaging} from './src/post-message';
+import {initTransportAPI} from './src/TransportAPI';
 
 type Props = {
   namespace?: string;
@@ -11,15 +15,21 @@ type Props = {
 export function initPegasusTransport({namespace}: Props = {}): void {
   const win = usePostMessaging('window');
 
-  const endpointRuntime = createEndpointRuntime('window', (message) =>
+  const messageRuntime = createMessageRuntime('window', (message) =>
     win.postMessage(message),
+  );
+  const eventRuntime = createBroadcastEventRuntime('window', (event) =>
+    win.postMessage(event),
   );
 
   win.onMessage((msg) => {
     if ('type' in msg && 'transactionID' in msg) {
-      endpointRuntime.endTransaction(msg.transactionID);
+      // msg is instance of EndpointWontRespondError
+      messageRuntime.endTransaction(msg.transactionID);
+    } else if (msg.messageType === 'broadcastEvent') {
+      eventRuntime.handleEvent(msg as InternalBroadcastEvent);
     } else {
-      endpointRuntime.handleMessage(msg);
+      messageRuntime.handleMessage(msg as InternalMessage);
     }
   });
 
@@ -27,34 +37,10 @@ export function initPegasusTransport({namespace}: Props = {}): void {
     win.setNamespace(namespace);
     win.enable();
   }
-  setMessagingAPI({
-    emitEvent: () => {
-      throw new Error('Not implemented');
-    },
-    onEvent: initEvents(namespace),
-    onMessage: endpointRuntime.onMessage,
-    sendMessage: endpointRuntime.sendMessage,
+  initTransportAPI({
+    emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    onBroadcastEvent: eventRuntime.onBroadcastEvent,
+    onMessage: messageRuntime.onMessage,
+    sendMessage: messageRuntime.sendMessage,
   });
-}
-
-function initEvents(namespace: string | undefined) {
-  return function onEvent<Message extends JsonValue = JsonValue>(
-    eventID: string,
-    callback: (message: Message) => void,
-  ): () => void {
-    const handleEvent = (event: CustomEvent) => {
-      callback(JSON.parse(event.detail));
-    };
-    window.addEventListener(
-      `pegasusEvents/${namespace}/${eventID}`,
-      handleEvent as EventListener,
-    );
-
-    return () => {
-      window.removeEventListener(
-        `pegasusEvents/${namespace}/${eventID}`,
-        handleEvent as EventListener,
-      );
-    };
-  };
 }

@@ -1,11 +1,10 @@
-export {getMessagingAPI} from './src/getMessagingAPI';
-export {isInternalEndpoint} from './src/is-internal-endpoint';
+export {isInternalEndpoint} from './src/isInternalEndpoint';
+export {getTransportAPI} from './src/TransportAPI';
 export {
-  BridgeMessage,
   Destination,
   Endpoint,
-  InternalMessage,
   OnMessageCallback,
+  PegasusMessage,
   ProtocolMap,
   ProtocolWithReturn,
   RuntimeContext,

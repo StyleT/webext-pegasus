@@ -22,7 +22,12 @@
     }
   },
   "include": ["./packages", "./test-utils"],
-  "exclude": ["**/dist/**", "**/npm/**", "**/node_modules/**"],
+  "exclude": [
+    "**/dist/**",
+    "**/npm/**",
+    "**/node_modules/**",
+    "./packages/example-extension"
+  ],
   "typedocOptions": {
     "logLevel": "Verbose"
   },

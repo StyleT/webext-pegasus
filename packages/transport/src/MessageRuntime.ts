@@ -1,37 +1,18 @@
 import type {
-  BridgeMessage,
-  DataTypeKey,
-  Destination,
-  GetDataType,
-  GetReturnType,
-  InternalMessage,
   OnMessageCallback,
+  PegasusMessage,
   RuntimeContext,
+  TransportMessagingAPI,
 } from './types';
+import type {InternalMessage} from './types-internal';
 import type {JsonValue} from 'type-fest';
 
 import {serializeError} from 'serialize-error';
 import uuid from 'tiny-uid';
 
-import {parseEndpoint} from './endpoint';
+import {deserializeEndpoint} from './utils/endpoint-utils';
 
-export interface EndpointRuntime {
-  sendMessage: <
-    ReturnType extends JsonValue,
-    K extends DataTypeKey = DataTypeKey,
-  >(
-    messageID: K,
-    data: GetDataType<K, JsonValue>,
-    destination?: Destination,
-  ) => Promise<GetReturnType<K, ReturnType>>;
-  onMessage: <
-    Data extends JsonValue = JsonValue,
-    K extends DataTypeKey = DataTypeKey,
-  >(
-    messageID: K,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>,
-  ) => () => void;
+export interface MessageRuntime extends TransportMessagingAPI {
   /**
    * @internal
    */
@@ -39,11 +20,11 @@ export interface EndpointRuntime {
   endTransaction: (transactionID: string) => void;
 }
 
-export const createEndpointRuntime = (
+export const createMessageRuntime = (
   thisContext: RuntimeContext,
-  routeMessage: (msg: InternalMessage) => void,
-  localMessage?: (msg: InternalMessage) => void,
-): EndpointRuntime => {
+  routeMessage: (msg: InternalMessage) => Promise<void>,
+  localMessage?: (msg: InternalMessage) => Promise<void>,
+): MessageRuntime => {
   const runtimeId = uuid();
   const openTransactions = new Map<
     string,
@@ -61,7 +42,7 @@ export const createEndpointRuntime = (
     ) {
       localMessage?.(message);
 
-      const {transactionId, messageID, messageType} = message;
+      const {transactionId, id: messageID, messageType} = message;
 
       const handleReply = () => {
         const transactionP = openTransactions.get(transactionId);
@@ -101,7 +82,7 @@ export const createEndpointRuntime = (
               id: messageID,
               sender: message.origin,
               timestamp: message.timestamp,
-            } as BridgeMessage<JsonValue>);
+            } as PegasusMessage<JsonValue>);
           } else {
             noHandlerFoundError = true;
             throw new Error(
@@ -159,7 +140,7 @@ export const createEndpointRuntime = (
     sendMessage: (messageID, data, destination = 'background') => {
       const endpoint =
         typeof destination === 'string'
-          ? parseEndpoint(destination)
+          ? deserializeEndpoint(destination)
           : destination;
       const errFn = 'Bridge#sendMessage ->';
 
@@ -174,7 +155,7 @@ export const createEndpointRuntime = (
           data,
           destination: endpoint,
           hops: [],
-          messageID,
+          id: messageID,
           messageType: 'message',
           origin: {context: thisContext, tabId: null},
           timestamp: Date.now(),

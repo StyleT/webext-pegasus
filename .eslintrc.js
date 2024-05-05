@@ -183,7 +183,7 @@ module.exports = {
     'react/no-is-mounted': OFF,
 
     // This isn't useful in our test code
-    'react/react-in-jsx-scope': ERROR,
+    'react/react-in-jsx-scope': OFF,
 
     'react/self-closing-comp': ERROR,
 

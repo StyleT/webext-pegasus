@@ -1,26 +1,15 @@
-import type {EndpointWontRespondError, InternalMessage} from './src/types';
+import type {
+  InternalBroadcastEvent,
+  InternalMessage,
+} from './src/types-internal';
 
-import {createEndpointRuntime} from './src/endpoint-runtime';
-import {EventData, setMessagingAPI} from './src/getMessagingAPI';
-import {createPersistentPort} from './src/persistent-port';
+import browser from 'webextension-polyfill';
+
+import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
+import {createMessageRuntime} from './src/MessageRuntime';
+import {createPersistentPort} from './src/PersistentPort';
 import {usePostMessaging} from './src/post-message';
-import {withExtensionEvents} from './src/withExtensionEvents';
-
-let windowMessagingNamespace: string | null = null;
-
-const eventChannel = withExtensionEvents((message: EventData) => {
-  if (windowMessagingNamespace === null) {
-    return;
-  }
-
-  const windowEvent = new CustomEvent(
-    `pegasusEvents/${windowMessagingNamespace}/${message.eventID}`,
-    {
-      detail: JSON.stringify(message.data),
-    },
-  );
-  window.dispatchEvent(windowEvent);
-});
+import {initTransportAPI} from './src/TransportAPI';
 
 type Props = {
   allowWindowMessagingForNamespace?: string;
@@ -31,32 +20,52 @@ export function initPegasusTransport({
 }: Props = {}): void {
   const win = usePostMessaging('content-script');
   const port = createPersistentPort();
-  const endpointRuntime = createEndpointRuntime('content-script', (message) => {
-    if (message.destination.context === 'window') {
-      win.postMessage(message);
-    } else {
-      port.postMessage(message);
+  const messageRuntime = createMessageRuntime(
+    'content-script',
+    async (message) => {
+      if (message.destination.context === 'window') {
+        await win.postMessage(message);
+      } else {
+        port.postMessage(message);
+      }
+    },
+  );
+  const eventRuntime = createBroadcastEventRuntime(
+    'content-script',
+    async (event) => {
+      browser.runtime.sendMessage(event);
+    },
+    async (event) => win.postMessage(event),
+  );
+  browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
+    if (message.messageType === 'broadcastEvent') {
+      eventRuntime.handleEvent(message);
     }
   });
 
-  win.onMessage((message: InternalMessage | EndpointWontRespondError) => {
+  win.onMessage((message) => {
     if ('type' in message && 'transactionID' in message) {
-      endpointRuntime.endTransaction(message.transactionID);
+      // msg is instance of EndpointWontRespondError
+      messageRuntime.endTransaction(message.transactionID);
     } else {
-      endpointRuntime.handleMessage(
-        Object.assign({}, message, {
-          origin: {
-            // a message event inside `content-script` means a script inside `window` dispatched it to be forwarded
-            // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
-            context: 'window',
-            tabId: null,
-          },
-        }),
-      );
+      const payload = Object.assign({}, message, {
+        origin: {
+          // a message event inside `content-script` means a script inside `window` dispatched it to be forwarded
+          // so we're making sure that the origin is not tampered (i.e script is not masquerading it's true identity)
+          context: 'window',
+          tabId: null,
+        },
+      });
+
+      if (payload.messageType === 'broadcastEvent') {
+        eventRuntime.handleEvent(payload as InternalBroadcastEvent);
+      } else {
+        messageRuntime.handleMessage(payload as InternalMessage);
+      }
     }
   });
 
-  port.onMessage(endpointRuntime.handleMessage);
+  port.onMessage(messageRuntime.handleMessage);
 
   port.onFailure((message) => {
     if (message.origin.context === 'window') {
@@ -68,19 +77,32 @@ export function initPegasusTransport({
       return;
     }
 
-    endpointRuntime.endTransaction(message.transactionId);
+    messageRuntime.endTransaction(message.transactionId);
   });
 
   if (allowWindowMessagingForNamespace) {
     win.setNamespace(allowWindowMessagingForNamespace);
     win.enable();
-    windowMessagingNamespace = allowWindowMessagingForNamespace;
   }
 
-  setMessagingAPI({
-    emitEvent: eventChannel.emitEvent,
-    onEvent: eventChannel.onEvent,
-    onMessage: endpointRuntime.onMessage,
-    sendMessage: endpointRuntime.sendMessage,
+  // const eventChannel = withExtensionEvents((message) => {
+  //   if (allowWindowMessagingForNamespace === null) {
+  //     return;
+  //   }
+
+  //   const windowEvent = new CustomEvent(
+  //     `pegasusEvents/${allowWindowMessagingForNamespace}/${message.eventID}`,
+  //     {
+  //       detail: JSON.stringify(message),
+  //     },
+  //   );
+  //   window.dispatchEvent(windowEvent);
+  // });
+
+  initTransportAPI({
+    emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    onBroadcastEvent: eventRuntime.onBroadcastEvent,
+    onMessage: messageRuntime.onMessage,
+    sendMessage: messageRuntime.sendMessage,
   });
 }

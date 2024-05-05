@@ -34,10 +34,10 @@ initPegasusTransport();
 As soon as Pegasus Transport was initialized - all other code that relies on transport layer may simply do the following:
 
 ```typescript
-import {getMessagingAPI} from '@webext-pegasus/transport';
+import {getTransportAPI} from '@webext-pegasus/transport';
 
 // This will work in any runtime context as initPegasusTransport() set needed adapter within module lexical scope
-const {sendMessage} = getMessagingAPI();
+const {sendMessage} = getTransportAPI();
 sendMessage(/* ... */);
 ```
 
