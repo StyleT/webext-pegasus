@@ -1,8 +1,11 @@
-import type {InternalBroadcastEvent, InternalMessage} from './src/types-internal';
+import type {
+  InternalBroadcastEvent,
+  InternalMessage,
+} from './src/types-internal';
 
 import browser from 'webextension-polyfill';
 
-import { createBroadcastEventRuntime } from './src/BroadcastEventRuntime';
+import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {createPersistentPort} from './src/PersistentPort';
 import {usePostMessaging} from './src/post-message';
@@ -17,16 +20,23 @@ export function initPegasusTransport({
 }: Props = {}): void {
   const win = usePostMessaging('content-script');
   const port = createPersistentPort();
-  const messageRuntime = createMessageRuntime('content-script', async (message) => {
-    if (message.destination.context === 'window') {
-      await win.postMessage(message);
-    } else {
-      port.postMessage(message);
-    }
-  });
-  const eventRuntime = createBroadcastEventRuntime('content-script', async (event) => {
-    browser.runtime.sendMessage(event);
-  }, async (event) => win.postMessage(event));
+  const messageRuntime = createMessageRuntime(
+    'content-script',
+    async (message) => {
+      if (message.destination.context === 'window') {
+        await win.postMessage(message);
+      } else {
+        port.postMessage(message);
+      }
+    },
+  );
+  const eventRuntime = createBroadcastEventRuntime(
+    'content-script',
+    async (event) => {
+      browser.runtime.sendMessage(event);
+    },
+    async (event) => win.postMessage(event),
+  );
   browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
     if (message.messageType === 'broadcastEvent') {
       eventRuntime.handleEvent(message);

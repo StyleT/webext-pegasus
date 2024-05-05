@@ -100,10 +100,10 @@ export const createBroadcastEventRuntime = (
     handleEvent: handleEvent,
     onBroadcastEvent: (eventID, callback) => {
       const currentListeners = onEventListeners.get(eventID) ?? [];
-      onEventListeners.set(
-        eventID,
-        [...currentListeners, callback as (event: PegasusMessage<JsonValue>) => void],
-      );
+      onEventListeners.set(eventID, [
+        ...currentListeners,
+        callback as (event: PegasusMessage<JsonValue>) => void,
+      ]);
 
       return () => {
         const oldListeners = onEventListeners.get(eventID) ?? [];

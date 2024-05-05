@@ -1,12 +1,15 @@
 import type {RequestMessage} from './src/PortMessage';
-import type {InternalBroadcastEvent, InternalMessage} from './src/types-internal';
+import type {
+  InternalBroadcastEvent,
+  InternalMessage,
+} from './src/types-internal';
 import type {DeliveryReceipt} from './src/utils/delivery-logger';
 import type {EndpointFingerprint} from './src/utils/endpoint-fingerprint';
 import type {Runtime} from 'webextension-polyfill';
 
 import browser from 'webextension-polyfill';
 
-import { createBroadcastEventRuntime } from './src/BroadcastEventRuntime';
+import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {PortMessage} from './src/PortMessage';
 import {initTransportAPI} from './src/TransportAPI';
@@ -349,29 +352,43 @@ export function initPegasusTransport(): void {
     });
   });
 
-  const eventRuntime = createBroadcastEventRuntime('background', async (event) => {
-    try {
-      await browser.runtime.sendMessage(event);
+  const eventRuntime = createBroadcastEventRuntime(
+    'background',
+    async (event) => {
+      try {
+        await browser.runtime.sendMessage(event);
+      } catch {
+        // do nothing - errors can be present when some extension contexts are not available
+        // Ex: popup is closed, devtools tab is closed, etc...
+      }
+
       const tabs = await browser.tabs.query({});
       for (const tab of tabs) {
         if (tab.id) {
-          await browser.tabs.sendMessage(tab.id, event);
+          try {
+            await browser.tabs.sendMessage(tab.id, event);
+          } catch {
+            // do nothing - errors can be present if no content script exists on receiver
+          }
         }
       }
-    } catch (e) {
-      // do nothing - errors can be present
-      // if no content script exists on receiver
-      console.warn('Suppressed error:', e);
-    }
 
-    // So background listeners receive events from other contexts
-    eventRuntime.handleEvent(event);
-  });
-  browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
-    if (message.messageType === 'broadcastEvent') {
-      eventRuntime.handleEvent(message);
-    }
-  });
+      // So background listeners receive events from other contexts
+      if (event.origin.context !== 'background') {
+        eventRuntime.handleEvent(event);
+      }
+    },
+  );
+  browser.runtime.onMessage.addListener(
+    (message: InternalBroadcastEvent, sender) => {
+      if (message.messageType === 'broadcastEvent') {
+        message.origin.tabId = sender.tab?.id ?? null;
+        message.origin.frameId = sender.frameId;
+
+        eventRuntime.handleEvent(message);
+      }
+    },
+  );
 
   initTransportAPI({
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,

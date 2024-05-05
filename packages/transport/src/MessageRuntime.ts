@@ -4,7 +4,7 @@ import type {
   RuntimeContext,
   TransportMessagingAPI,
 } from './types';
-import type { InternalMessage } from './types-internal';
+import type {InternalMessage} from './types-internal';
 import type {JsonValue} from 'type-fest';
 
 import {serializeError} from 'serialize-error';

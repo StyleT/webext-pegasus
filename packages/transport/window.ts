@@ -1,6 +1,9 @@
-import type {InternalBroadcastEvent, InternalMessage} from './src/types-internal';
+import type {
+  InternalBroadcastEvent,
+  InternalMessage,
+} from './src/types-internal';
 
-import { createBroadcastEventRuntime } from './src/BroadcastEventRuntime';
+import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {usePostMessaging} from './src/post-message';
 import {initTransportAPI} from './src/TransportAPI';

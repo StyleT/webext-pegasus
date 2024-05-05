@@ -77,7 +77,9 @@ export interface TransportBroadcastEventAPI {
   ) => Promise<void>;
 }
 
-export interface TransportAPI extends TransportMessagingAPI, TransportBroadcastEventAPI {}
+export interface TransportAPI
+  extends TransportMessagingAPI,
+    TransportBroadcastEventAPI {}
 
 declare const ProtocolWithReturnSymbol: unique symbol;
 

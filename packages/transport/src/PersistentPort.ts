@@ -36,11 +36,7 @@ export const createPersistentPort = (name = '') => {
   const handleMessage = (msg: StatusMessage, msgPort: Runtime.Port) => {
     switch (msg.status) {
       case 'undeliverable':
-        if (
-          !undeliveredQueue.some(
-            (m) => m.message.id === msg.message.id,
-          )
-        ) {
+        if (!undeliveredQueue.some((m) => m.message.id === msg.message.id)) {
           undeliveredQueue = [
             ...undeliveredQueue,
             {

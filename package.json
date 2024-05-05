@@ -8,14 +8,15 @@
     "packages/transport",
     "packages/rpc",
     "packages/store",
-    "packages/store-zustand"
+    "packages/store-zustand",
+    "packages/example-extension"
   ],
   "engines": {
     "npm": ">=8.2.3"
   },
   "engineStrict": true,
   "scripts": {
-    "tsc": "tsc",
+    "tsc": "tsc && npm run tsc --workspace @webext-pegasus/example-extension",
     "prepare": "husky install",
     "build": "npm run build --workspaces",
     "lint": "eslint ./",
