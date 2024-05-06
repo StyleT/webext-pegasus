@@ -22,6 +22,16 @@ This library provides two communication patterns:
 * **Runtime contexts:** window (injected script), popup, devtools, content script, background, options, sidepanel (_planned_)
 * **Browsers:** Chrome, Firefox, Safari, Opera, Edge + others supported by [webextension-polyfill](https://github.com/mozilla/webextension-polyfill)
 
+## Comparison to other libraries
+
+|                                  | `@webext-pegasus/transport` | `webext-bridge`| `@webext-core/messaging` |
+|----------------------------------|-----------------------------|----------------|--------------------------|
+| Injected script (window) support | ✅                          | ✅              | ❌                       |
+| One-on-one messaging             | ✅                          | ✅              | ✅                       |
+| Event Broadcasting               | ✅                          | ❌              | ❌                       |
+| Context agnostic APIs            | ✅                          | ❌              | ✅                       |
+| Type Safety                      | ✅                          | 🌦️              | ✅                       |
+
 
 ## 🚀 Quick Start
 
@@ -62,14 +72,6 @@ sendMessage(/* ... */);
  - `@webext-pegasus/transport/popup`
  - `@webext-pegasus/transport/window` (for injected scripts)
 
- ## Comparison to other libraries
-
- | | `@webext-pegasus/transport` | `webext-bridge` |
- | - | - | - |
- | One-on-one messaging | ✅ | ✅ |
- | Event Broadcasting | ✅ | ❌ |
- | Context agnostic APIs | ✅ | ❌ |
- | Type Safety | ✅ | 🌦️ |
 
 ## Troubleshooting
 
