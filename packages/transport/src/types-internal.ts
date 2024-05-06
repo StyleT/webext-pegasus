@@ -44,22 +44,23 @@ export type MaybePromise<T> = Promise<T> | T;
 /**
  * Given a function declaration, `ProtocolWithReturn`, or a value, return the message's data type.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GetMessageProtocolDataType<T> = T extends (
   ...args: infer Args
-) => any
+) => // eslint-disable-next-line @typescript-eslint/no-explicit-any
+any
   ? Args['length'] extends 0 | 1
     ? Args[0]
     : never
-  : T extends any
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends any
   ? T
   : never;
 
 /**
  * Given a function declaration, `ProtocolWithReturn`, or a value, return the message's return type.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GetMessageProtocolReturnType<T> = T extends (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...args: any[]
 ) => infer R
   ? R

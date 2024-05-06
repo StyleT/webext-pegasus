@@ -57,9 +57,9 @@ const messagingAPI: TransportAPI = {
     };
   },
   onMessage: (messageID: string, fn) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     listeners.onMessage.push([
       messageID,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fn as (message: PegasusMessage<any>) => unknown,
     ]);
 
