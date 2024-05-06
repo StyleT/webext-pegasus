@@ -1,4 +1,4 @@
-import type {OnMessageCallback, PegasusMessage} from '../packages/transport';
+import type {PegasusMessage} from '../packages/transport';
 
 import {JsonValue} from 'type-fest';
 
@@ -9,7 +9,7 @@ const listeners: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onEvent: Array<[string, event: (event: PegasusMessage<JsonValue>) => void]>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onMessage: Array<[string, OnMessageCallback<any, unknown>]>;
+  onMessage: Array<[string, (message: PegasusMessage<any>) => unknown]>;
 } = {
   onEvent: [],
   onMessage: [],
@@ -56,8 +56,12 @@ const messagingAPI: TransportAPI = {
       }
     };
   },
-  onMessage: (messageID, fn) => {
-    listeners.onMessage.push([messageID, fn]);
+  onMessage: (messageID: string, fn) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    listeners.onMessage.push([
+      messageID,
+      fn as (message: PegasusMessage<any>) => unknown,
+    ]);
 
     return () => {
       const index = listeners.onMessage.findIndex(([, cb]) => cb === fn);
@@ -68,10 +72,10 @@ const messagingAPI: TransportAPI = {
   },
   sendMessage: async <RT = unknown>(
     messageID: string,
-    payload: JsonValue,
+    data: JsonValue,
   ): Promise<RT> => {
     const message: PegasusMessage<object> = {
-      data: payload as object,
+      data: data as object,
       id: '1',
       sender: {
         context: 'window',
@@ -94,7 +98,7 @@ const messagingAPI: TransportAPI = {
 
     return cb(message) as RT;
   },
-};
+} as TransportAPI;
 
 initTransportAPI(messagingAPI);
 

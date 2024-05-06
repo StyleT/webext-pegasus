@@ -1,7 +1,8 @@
 import type {Destination, IPegasusRPCService, PegasusRPCService} from './types';
 
-import {getTransportAPI} from '@webext-pegasus/transport';
+import {definePegasusMessageBus} from '@webext-pegasus/transport';
 
+import {IRPCMessaging} from './IRPCMessaging';
 import {createProxy} from './utils/createProxy';
 import {getMessageKey} from './utils/getMessageKey';
 
@@ -27,7 +28,7 @@ export function registerRPCService<
   const messageKey = getMessageKey(serviceName);
   const pegasusService: Service = service;
 
-  const {onMessage} = getTransportAPI();
+  const {onMessage} = definePegasusMessageBus<IRPCMessaging>();
 
   onMessage(messageKey, ({data, ...message}) => {
     if (

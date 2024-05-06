@@ -1,5 +1,7 @@
+import type {IStoreEventBus} from './IStoreEventBus';
+
 import {getRPCService} from '@webext-pegasus/rpc';
-import {getTransportAPI} from '@webext-pegasus/transport';
+import {definePegasusEventBus} from '@webext-pegasus/transport';
 
 import {MessageType} from './constants';
 import {IStoreCommunicationBridge} from './StoreCommunicationBridge';
@@ -59,7 +61,7 @@ export class PegasusStore<
       'background',
     );
 
-    const {onBroadcastEvent} = getTransportAPI();
+    const {onBroadcastEvent} = definePegasusEventBus<IStoreEventBus>();
 
     // We request the latest available state data to initialise our store
     this.bridge

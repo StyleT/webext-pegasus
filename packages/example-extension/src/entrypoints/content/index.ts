@@ -1,4 +1,6 @@
-import {getTransportAPI} from '@webext-pegasus/transport';
+import type {ITestEventBus} from '@/ITestEventBus';
+
+import {definePegasusEventBus} from '@webext-pegasus/transport';
 import {initPegasusTransport} from '@webext-pegasus/transport/content-script';
 
 import injectScript from './injectScript';
@@ -11,12 +13,12 @@ export default defineContentScript({
 
     injectScript('/injected.js');
 
-    const transportAPI = getTransportAPI();
-    transportAPI.onBroadcastEvent<string>('test-event', (data) => {
+    const eventBus = definePegasusEventBus<ITestEventBus>();
+    eventBus.onBroadcastEvent('test-event', (data) => {
       // eslint-disable-next-line no-console
       console.log('received test-event at content script', data);
     });
-    transportAPI.emitBroadcastEvent<string>(
+    eventBus.emitBroadcastEvent(
       'test-event',
       'Hello world from content script!',
     );

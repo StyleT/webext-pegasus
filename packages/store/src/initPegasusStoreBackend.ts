@@ -1,5 +1,7 @@
+import type {IStoreEventBus} from './IStoreEventBus';
+
 import {registerRPCService} from '@webext-pegasus/rpc';
-import {getTransportAPI} from '@webext-pegasus/transport';
+import {definePegasusEventBus} from '@webext-pegasus/transport';
 
 import {MessageType} from './constants';
 import {StoreCommunicationBridge} from './StoreCommunicationBridge';
@@ -39,7 +41,7 @@ export function initPegasusStoreBackend<
     diffStrategy = shallowDiff,
   }: PegasusStoreBackendProps<S, A>,
 ) {
-  const {emitBroadcastEvent} = getTransportAPI();
+  const {emitBroadcastEvent} = definePegasusEventBus<IStoreEventBus>();
 
   registerRPCService(
     `PegasusStoreCommunicationBridgeFor-${portName}`,

@@ -1,6 +1,8 @@
 import type {Destination, PegasusRPCService} from '../types';
 
-import {getTransportAPI} from '@webext-pegasus/transport';
+import {definePegasusMessageBus} from '@webext-pegasus/transport';
+
+import {IRPCMessaging} from '../IRPCMessaging';
 
 /**
  * Create and returns a "deep" proxy. Every property that is accessed returns another proxy, and
@@ -16,7 +18,7 @@ export function createProxy<TService>(
   const proxy = new Proxy(wrapped, {
     // Executed when the object is called as a function
     apply(_target, _thisArg, args) {
-      const {sendMessage} = getTransportAPI();
+      const {sendMessage} = definePegasusMessageBus<IRPCMessaging>();
 
       return sendMessage(
         messageKey,

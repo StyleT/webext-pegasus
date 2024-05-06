@@ -1,6 +1,5 @@
 import type {
   OnMessageCallback,
-  PegasusMessage,
   RuntimeContext,
   TransportMessagingAPI,
 } from './types';
@@ -31,8 +30,7 @@ export const createMessageRuntime = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     {resolve: (v: any) => void; reject: (e: any) => void}
   >();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onMessageListeners = new Map<string, OnMessageCallback<any>>();
+  const onMessageListeners = new Map<string, OnMessageCallback>();
 
   const handleMessage = (message: InternalMessage) => {
     if (
@@ -77,12 +75,12 @@ export const createMessageRuntime = (
         try {
           const cb = onMessageListeners.get(messageID);
           if (typeof cb === 'function') {
-            reply = await cb({
-              data: message.data,
+            reply = (await cb({
+              data: message.data as never,
               id: messageID,
               sender: message.origin,
               timestamp: message.timestamp,
-            } as PegasusMessage<JsonValue>);
+            })) as JsonValue;
           } else {
             noHandlerFoundError = true;
             throw new Error(

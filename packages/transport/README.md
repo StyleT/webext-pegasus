@@ -14,8 +14,8 @@ No more `chrome.runtime.sendMessage` or `chrome.runtime.onConnect` or `window.di
 
 This library provides two communication patterns:
 
-- **One-on-one messaging with optional replies** – via `sendMessage` and `onMessage` APIs. Resilient way of communication between any 2 contexts. Ex: DevTools panel and injected script within instected tab.
-- **Event broadcasting** – via `emitBroadcastEvent` and `onBroadcastEvent`. This allows you to inform other extension contexts about certains events. Ex: broadcast changes to all open tabs
+- **One-on-one messaging with optional replies** – via `definePegasusMessageBus` API. Resilient way of communication between any 2 contexts. Ex: DevTools panel and injected script within instected tab.
+- **Event broadcasting** – via `definePegasusEventBus` API. This allows you to inform other extension contexts about certains events. Ex: broadcast changes to all open tabs
 
 ## Supports
 
@@ -26,10 +26,10 @@ This library provides two communication patterns:
 
 |                                  | `@webext-pegasus/transport` | `webext-bridge`| `@webext-core/messaging` |
 |----------------------------------|-----------------------------|----------------|--------------------------|
-| Injected script (window) support | ✅                          | ✅              | ❌                       |
+| Injected script (window) support | ✅                          | ✅              | 🌦️                       |
 | One-on-one messaging             | ✅                          | ✅              | ✅                       |
 | Event Broadcasting               | ✅                          | ❌              | ❌                       |
-| Context agnostic APIs            | ✅                          | ❌              | ✅                       |
+| Context agnostic APIs            | ✅                          | ❌              | 🌦️                       |
 | Type Safety                      | ✅                          | 🌦️              | ✅                       |
 
 
@@ -42,7 +42,7 @@ npm install -S @webext-pegasus/transport
 Initialize Pegasus transport layer **once for every runtime context** you use in your extension.
 
 ```typescript
-// background.ts
+// background.ts + once per all other extension contexts
 import { initPegasusTransport } from '@webext-pegasus/transport/background';
 
 initPegasusTransport();
@@ -52,16 +52,34 @@ initPegasusTransport();
 As soon as Pegasus Transport was initialized - all other code that relies on transport layer may simply do the following:
 
 ```typescript
-import {getTransportAPI} from '@webext-pegasus/transport';
+import {definePegasusEventBus, definePegasusMessageBus} from '@webext-pegasus/transport';
 
-// This will work in any runtime context as initPegasusTransport() set needed adapter within module's lexical scope
-const {
-  sendMessage,
-  onMessage,
-  emitBroadcastEvent,
-  onBroadcastEvent
-} = getTransportAPI();
-sendMessage(/* ... */);
+// Message Bus
+interface ITestMessageBus {
+  stringLength(data: string): number;
+}
+const messageBus = definePegasusMessageBus<ITestEventBus>();
+messageBus.onMessage('stringLength', (message) => {
+  return message.data.length;
+});
+messageBus.sendMessage(
+  'stringLength',
+  'some string',
+  'background', // Destination of the message
+);
+
+// Event Bus
+interface ITestEventBus {
+  testEvent: string;
+}
+const eventBus = definePegasusEventBus<ITestEventBus>();
+eventBus.onBroadcastEvent('testEvent', (message) => {
+  console.log('received test-event with', message.data, 'from', message.sender);
+});
+eventBus.emitBroadcastEvent(
+  'testEvent',
+  'Hello world from background script!',
+);
 ```
 
 ## Available entrypoints:

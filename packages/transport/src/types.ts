@@ -1,4 +1,12 @@
-import type {Jsonify, JsonValue} from 'type-fest';
+import type {JsonValue} from 'type-fest';
+
+import {
+  GetMessageProtocolDataType,
+  GetMessageProtocolReturnType,
+  MaybePromise,
+  Proimsify,
+  RemoveListenerCallback,
+} from './types-internal';
 
 export type RuntimeContext =
   | 'devtools'
@@ -16,18 +24,28 @@ export interface Endpoint {
 
 export type Destination = Endpoint | RuntimeContext | string;
 
-export interface PegasusMessage<T extends JsonValue> {
-  sender: Endpoint;
+export interface PegasusMessage<TData extends JsonValue> {
+  /**
+   * The data that was passed into `sendMessage`
+   */
+  data: TData;
   id: string;
-  data: T;
   timestamp: number;
+  sender: Endpoint;
 }
 
-export type OnMessageCallback<T extends JsonValue, R = void | JsonValue> = (
-  message: PegasusMessage<T>,
-) => R | Promise<R>;
+export type OnMessageCallback<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TProtocolMap extends Record<string, any> = Record<string, any>,
+  TType extends keyof TProtocolMap = never,
+> = (
+  message: PegasusMessage<GetMessageProtocolDataType<TProtocolMap[TType]>>,
+) => MaybePromise<GetMessageProtocolReturnType<TProtocolMap[TType]>>;
 
-export interface TransportMessagingAPI {
+export interface TransportMessagingAPI<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TProtocolMap extends Record<string, any> = Record<string, any>,
+> {
   /**
    * Sends a message to some other part of your extension.
    *
@@ -37,33 +55,33 @@ export interface TransportMessagingAPI {
    * - An error thrown in listener callback (in the destination context) will behave as usual, that is, bubble up, but the same error will also be thrown where sendMessage was called
    * - If the listener receives the message but the destination disconnects (tab closure for exmaple) before responding, sendMessage will throw an error in the sender context.
    */
-  sendMessage: <
-    ReturnType extends JsonValue,
-    K extends DataTypeKey = DataTypeKey,
-  >(
-    messageID: K,
-    data: GetDataType<K, JsonValue>,
+  sendMessage: <TType extends keyof TProtocolMap>(
+    messageID: TType,
+    data: GetMessageProtocolDataType<TProtocolMap[TType]>,
     destination?: Destination,
-  ) => Promise<GetReturnType<K, ReturnType>>;
+  ) => Proimsify<GetMessageProtocolReturnType<TProtocolMap[TType]>>;
   /**
    * Register one and only one listener, per messageId per context. That will be called upon sendMessage from other side.
    * Optionally, send a response to sender by returning any value or if async a Promise.
    */
-  onMessage: <Data extends JsonValue, K extends DataTypeKey = DataTypeKey>(
-    messageID: K,
+  onMessage: <TType extends keyof TProtocolMap>(
+    messageID: TType,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callback: OnMessageCallback<GetDataType<K, Data>, GetReturnType<K, any>>,
-  ) => () => void;
+    callback: OnMessageCallback<TProtocolMap, TType>,
+  ) => RemoveListenerCallback;
 }
 
-export interface TransportBroadcastEventAPI {
+export interface TransportBroadcastEventAPI<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TProtocolMap extends Record<string, any> = Record<string, any>,
+> {
   /**
    * Broadcast Channel API alternative for browser extensions
    * Allows basic communication between extension contexts (that is, windows, popups, devtools, content-scripts, background, etc...)
    */
-  onBroadcastEvent: <Data extends JsonValue>(
-    eventID: string,
-    callback: (event: PegasusMessage<Data>) => void,
+  onBroadcastEvent: <TType extends keyof TProtocolMap>(
+    eventID: TType,
+    callback: (event: PegasusMessage<TProtocolMap[TType]>) => void,
   ) => () => void;
   /**
    * Broadcast Channel API alternative for browser extensions
@@ -71,63 +89,13 @@ export interface TransportBroadcastEventAPI {
    *
    * Emits an event, which can be of any kind of serialazible Object, to "every" listener in any extension context with the same extension.
    */
-  emitBroadcastEvent: <Data extends JsonValue>(
-    eventID: string,
-    data: Data,
+  emitBroadcastEvent: <TType extends keyof TProtocolMap>(
+    eventID: TType,
+    data: TProtocolMap[TType],
   ) => Promise<void>;
 }
 
 export interface TransportAPI
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extends TransportMessagingAPI,
     TransportBroadcastEventAPI {}
-
-declare const ProtocolWithReturnSymbol: unique symbol;
-
-export interface ProtocolWithReturn<Data, Return> {
-  data: Jsonify<Data>;
-  return: Jsonify<Return>;
-  /**
-   * Type differentiator only.
-   */
-  [ProtocolWithReturnSymbol]: true;
-}
-
-/**
- * Extendable by user.
- */
-export interface ProtocolMap {
-  // foo: { id: number, name: string }
-  // bar: ProtocolWithReturn<string, number>
-}
-
-export type DataTypeKey = keyof ProtocolMap extends never
-  ? string
-  : keyof ProtocolMap;
-
-export type GetDataType<
-  K extends DataTypeKey,
-  Fallback extends JsonValue = null,
-> = K extends keyof ProtocolMap
-  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ProtocolMap[K] extends (...args: infer Args) => any
-    ? Args['length'] extends 0
-      ? undefined
-      : Args[0]
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ProtocolMap[K] extends ProtocolWithReturn<infer Data, any>
-    ? Data
-    : ProtocolMap[K]
-  : Fallback;
-
-export type GetReturnType<
-  K extends DataTypeKey,
-  Fallback extends JsonValue = null,
-> = K extends keyof ProtocolMap
-  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ProtocolMap[K] extends (...args: any[]) => infer R
-    ? R
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ProtocolMap[K] extends ProtocolWithReturn<any, infer Return>
-    ? Return
-    : void
-  : Fallback;
