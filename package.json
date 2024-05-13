@@ -16,7 +16,7 @@
   },
   "engineStrict": true,
   "scripts": {
-    "tsc": "tsc && npm run tsc --workspace @webext-pegasus/example-extension",
+    "tsc": "tsc && npm run tsc --workspace example-extension",
     "prepare": "husky install",
     "build": "npm run build --workspaces",
     "lint": "eslint ./",
