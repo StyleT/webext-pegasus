@@ -3,13 +3,16 @@ import type {ITestEventBus} from '@/ITestEventBus';
 import {definePegasusEventBus} from '@webext-pegasus/transport';
 import {initPegasusTransport} from '@webext-pegasus/transport/content-script';
 
+import {renderStoreCounterUI} from '@/renderStoreCounterUI';
+
 import injectScript from './injectScript';
 
 export default defineContentScript({
   main() {
     initPegasusTransport({allowWindowMessagingForNamespace: 'pegasus-example'});
+
     // eslint-disable-next-line no-console
-    console.log('Hello content.');
+    console.log('@webext/pegasus content script: loaded.');
 
     injectScript('/injected.js');
 
@@ -22,6 +25,8 @@ export default defineContentScript({
       'test-event',
       'Hello world from content script!',
     );
+
+    renderStoreCounterUI('content-script');
   },
   matches: ['<all_urls>'],
   registration: 'manifest',

@@ -4,6 +4,8 @@
 **/config/**
 **/build/**
 **/npm/**
+**/.wxt/**
+**/.output/**
 **/*.js.flow
 **/*.d.ts
 **/playwright*/**

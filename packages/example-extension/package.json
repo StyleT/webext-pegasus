@@ -1,5 +1,5 @@
 {
-  "name": "@webext-pegasus/example-extension",
+  "name": "example-extension",
   "description": "Example extension that showcases webext-pegasus libraries",
   "private": true,
   "version": "0.0.0",
@@ -8,10 +8,20 @@
     "tsc": "tsc",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
-    "build": "wxt build",
+    "dev:edge": "wxt -b edge",
+    "dev:safari:open": "open .output/safari-mv2-xcode/example-extension/build/Release/example-extension.app",
+    "dev:safari:pack": "npm run build:safari -- --mode development && xcrun safari-web-extension-converter --project-location ./.output/safari-mv2-xcode --force --macos-only --no-prompt --no-open .output/safari-mv2 && xcodebuild -configuration Debug -scheme example-extension -project .output/safari-mv2-xcode/example-extension/example-extension.xcodeproj",
+    "build": "npm-run-all build:chrome build:firefox build:edge build:safari",
+    "build:chrome": "wxt build -b chrome",
     "build:firefox": "wxt build -b firefox",
-    "zip": "wxt zip",
-    "zip:firefox": "wxt zip -b firefox",
+    "build:edge": "wxt build -b edge",
+    "build:safari": "wxt build -b safari",
+    "zip": "npm-run-all zip:chrome zip:firefox zip:edge",
+    "zip:chrome": "wxt zip -b chrome",
+    "zip:firefox": "cp ./SOURCE_CODE_REVIEW.md ../.. && wxt zip -b firefox",
+    "zip:edge": "wxt zip -b edge",
+    "publish": "wxt submit --edge-zip .output/*-edge.zip --firefox-zip .output/*-firefox.zip --firefox-sources-zip .output/*-sources.zip",
+    "bundle-analyzer:open": "wxt build --analyze --analyze-open",
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare"
   },
@@ -21,7 +31,8 @@
     "@webext-pegasus/transport": "^0.0.4",
     "@webext-pegasus/rpc": "^0.0.4",
     "@webext-pegasus/store": "^0.0.4",
-    "@webext-pegasus/store-zustand": "^0.0.4"
+    "@webext-pegasus/store-zustand": "^0.0.4",
+    "zustand": "^4.5.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.46",

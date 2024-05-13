@@ -5,6 +5,7 @@ packages/**/build/**
 packages/**/npm/**
 packages/**/config/**
 packages/**/.wxt/**
+packages/**/.output/**
 packages/**/vite.config.js
 packages/**/vite.prod.config.js
 **/*.md
