@@ -1,4 +1,4 @@
-import type {InternalMessage} from './types-internal';
+import type {InternalPacket} from './types-internal';
 import type {DeliveryReceipt} from './utils/delivery-logger';
 import type {EndpointFingerprint} from './utils/endpoint-fingerprint';
 import type {Runtime} from 'webextension-polyfill';
@@ -6,7 +6,7 @@ import type {Runtime} from 'webextension-polyfill';
 export type StatusMessage =
   | {
       status: 'undeliverable';
-      message: InternalMessage;
+      message: InternalPacket;
       resolvedDestination: string;
     }
   | {
@@ -19,7 +19,7 @@ export type StatusMessage =
     }
   | {
       status: 'incoming';
-      message: InternalMessage;
+      message: InternalPacket;
     }
   | {
       status: 'terminated';
@@ -34,7 +34,7 @@ export type RequestMessage =
     }
   | {
       type: 'deliver';
-      message: InternalMessage;
+      message: InternalPacket;
     };
 
 export class PortMessage {

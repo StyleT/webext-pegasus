@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 
 // Create the panel which appears within the browser devtools
 browser.devtools.panels.create(
@@ -5,3 +6,5 @@ browser.devtools.panels.create(
   '/wxt.svg',
   'devtools-panel.html',
 );
+
+console.log('DevTools page: loaded.');

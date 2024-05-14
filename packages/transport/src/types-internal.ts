@@ -8,6 +8,7 @@ export interface InternalPacket {
   timestamp: number;
   hops: string[];
   id: string;
+  transactionId: string;
 }
 
 export interface InternalBroadcastEvent extends InternalPacket {
@@ -17,7 +18,6 @@ export interface InternalBroadcastEvent extends InternalPacket {
 
 export interface InternalMessage extends InternalPacket {
   destination: Endpoint;
-  transactionId: string;
   messageType: 'message' | 'reply';
   err?: JsonValue;
   data?: JsonValue | void;

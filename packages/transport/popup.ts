@@ -1,10 +1,8 @@
-import browser from 'webextension-polyfill';
-
 import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {createPersistentPort} from './src/PersistentPort';
 import {initTransportAPI} from './src/TransportAPI';
-import {InternalBroadcastEvent} from './src/types-internal';
+import {internalPacketTypeRouter} from './src/utils/internalPacketTypeRouter';
 
 export function initPegasusTransport(): void {
   const port = createPersistentPort('popup');
@@ -12,16 +10,12 @@ export function initPegasusTransport(): void {
     port.postMessage(message),
   );
 
-  port.onMessage(messageRuntime.handleMessage);
+  port.onMessage((packet) =>
+    internalPacketTypeRouter(packet, {eventRuntime, messageRuntime}),
+  );
 
   const eventRuntime = createBroadcastEventRuntime('popup', async (event) => {
-    browser.runtime.sendMessage(event);
-  });
-
-  browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
-    if (message.messageType === 'broadcastEvent') {
-      eventRuntime.handleEvent(message);
-    }
+    port.postMessage(event);
   });
 
   initTransportAPI({

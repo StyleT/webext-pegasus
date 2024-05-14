@@ -1,5 +1,5 @@
 import type {StatusMessage} from './PortMessage';
-import type {InternalMessage} from './types-internal';
+import type {InternalPacket} from './types-internal';
 import type {Runtime} from 'webextension-polyfill';
 
 import browser from 'webextension-polyfill';
@@ -11,7 +11,7 @@ import {createFingerprint} from './utils/endpoint-fingerprint';
 
 interface QueuedMessage {
   resolvedDestination: string;
-  message: InternalMessage;
+  message: InternalPacket;
 }
 
 /**
@@ -29,9 +29,9 @@ export const createPersistentPort = (name = '') => {
   let undeliveredQueue: ReadonlyArray<QueuedMessage> = [];
   const pendingResponses = createDeliveryLogger();
   const onMessageListeners = new Set<
-    (message: InternalMessage, p: Runtime.Port) => void
+    (message: InternalPacket, p: Runtime.Port) => void
   >();
-  const onFailureListeners = new Set<(message: InternalMessage) => void>();
+  const onFailureListeners = new Set<(message: InternalPacket) => void>();
 
   const handleMessage = (msg: StatusMessage, msgPort: Runtime.Port) => {
     switch (msg.status) {
@@ -116,13 +116,13 @@ export const createPersistentPort = (name = '') => {
   connect();
 
   return {
-    onFailure(cb: (message: InternalMessage) => void) {
+    onFailure(cb: (message: InternalPacket) => void) {
       onFailureListeners.add(cb);
     },
-    onMessage(cb: (message: InternalMessage) => void): void {
+    onMessage(cb: (message: InternalPacket) => void): void {
       onMessageListeners.add(cb);
     },
-    postMessage(message: InternalMessage): void {
+    postMessage(message: InternalPacket): void {
       PortMessage.toBackground(port, {
         message,
         type: 'deliver',

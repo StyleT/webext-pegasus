@@ -93,6 +93,7 @@ export const createBroadcastEventRuntime = (
           tabId: null,
         },
         timestamp: Date.now(),
+        transactionId: uuid(),
       };
 
       return await handleEvent(payload);

@@ -7,6 +7,10 @@ import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {usePostMessaging} from './src/post-message';
 import {initTransportAPI} from './src/TransportAPI';
+import {
+  isInternalBroadcastEvent,
+  isInternalMessage,
+} from './src/utils/internalPacketTypeGuards';
 
 type Props = {
   namespace?: string;
@@ -26,10 +30,12 @@ export function initPegasusTransport({namespace}: Props = {}): void {
     if ('type' in msg && 'transactionID' in msg) {
       // msg is instance of EndpointWontRespondError
       messageRuntime.endTransaction(msg.transactionID);
-    } else if (msg.messageType === 'broadcastEvent') {
-      eventRuntime.handleEvent(msg as InternalBroadcastEvent);
+    } else if (isInternalBroadcastEvent(msg)) {
+      eventRuntime.handleEvent(msg);
+    } else if (isInternalMessage(msg)) {
+      messageRuntime.handleMessage(msg);
     } else {
-      messageRuntime.handleMessage(msg as InternalMessage);
+      throw new TypeError('Unknown message type');
     }
   });
 

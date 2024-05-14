@@ -1,8 +1,5 @@
 import type {RequestMessage} from './src/PortMessage';
-import type {
-  InternalBroadcastEvent,
-  InternalMessage,
-} from './src/types-internal';
+import type {InternalPacket} from './src/types-internal';
 import type {DeliveryReceipt} from './src/utils/delivery-logger';
 import type {EndpointFingerprint} from './src/utils/endpoint-fingerprint';
 import type {Runtime} from 'webextension-polyfill';
@@ -20,6 +17,7 @@ import {
   deserializeEndpoint,
   serializeEndpoint,
 } from './src/utils/endpoint-utils';
+import {internalPacketTypeRouter} from './src/utils/internalPacketTypeRouter';
 
 interface PortConnection {
   port: Runtime.Port;
@@ -61,7 +59,7 @@ export function initPegasusTransport(): void {
       const nextChain = <T>(v: T) => ({and: () => v});
 
       const notifications = {
-        aboutIncomingMessage: (message: InternalMessage) => {
+        aboutIncomingMessage: (message: InternalPacket) => {
           const recipient = connMap.get(endpoint);
           if (recipient == null) {
             throw new Error('Unable to find recipient endpoint');
@@ -77,7 +75,7 @@ export function initPegasusTransport(): void {
 
         aboutMessageUndeliverability: (
           resolvedDestination: string,
-          message: InternalMessage,
+          message: InternalPacket,
         ) => {
           const sender = connMap.get(endpoint);
           if (sender?.fingerprint === fingerprint) {
@@ -347,7 +345,7 @@ export function initPegasusTransport(): void {
         msg.message.origin.tabId = linkedTabId;
         msg.message.origin.frameId = linkedFrameId;
 
-        messageRuntime.handleMessage(msg.message);
+        internalPacketTypeRouter(msg.message, {eventRuntime, messageRuntime});
       }
     });
   });
@@ -355,37 +353,15 @@ export function initPegasusTransport(): void {
   const eventRuntime = createBroadcastEventRuntime(
     'background',
     async (event) => {
-      try {
-        await browser.runtime.sendMessage(event);
-      } catch {
-        // do nothing - errors can be present when some extension contexts are not available
-        // Ex: popup is closed, devtools tab is closed, etc...
-      }
-
-      const tabs = await browser.tabs.query({});
-      for (const tab of tabs) {
-        if (tab.id) {
-          try {
-            await browser.tabs.sendMessage(tab.id, event);
-          } catch {
-            // do nothing - errors can be present if no content script exists on receiver
-          }
-        }
-      }
+      connMap.forEach((port, endpoint) => {
+        notifyEndpoint(endpoint)
+          .withFingerprint(port.fingerprint)
+          .aboutIncomingMessage(event);
+      });
 
       // So background listeners receive events from other contexts
       if (event.origin.context !== 'background') {
         eventRuntime.handleEvent(event);
-      }
-    },
-  );
-  browser.runtime.onMessage.addListener(
-    (message: InternalBroadcastEvent, sender) => {
-      if (message.messageType === 'broadcastEvent') {
-        message.origin.tabId = sender.tab?.id ?? null;
-        message.origin.frameId = sender.frameId;
-
-        eventRuntime.handleEvent(message);
       }
     },
   );

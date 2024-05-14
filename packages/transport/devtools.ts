@@ -4,7 +4,7 @@ import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {createPersistentPort} from './src/PersistentPort';
 import {initTransportAPI} from './src/TransportAPI';
-import {InternalBroadcastEvent} from './src/types-internal';
+import {internalPacketTypeRouter} from './src/utils/internalPacketTypeRouter';
 
 export function initPegasusTransport(): void {
   const port = createPersistentPort(
@@ -14,20 +14,16 @@ export function initPegasusTransport(): void {
     port.postMessage(message),
   );
 
-  port.onMessage(messageRuntime.handleMessage);
+  port.onMessage((packet) =>
+    internalPacketTypeRouter(packet, {eventRuntime, messageRuntime}),
+  );
 
   const eventRuntime = createBroadcastEventRuntime(
     'devtools',
     async (event) => {
-      browser.runtime.sendMessage(event);
+      port.postMessage(event);
     },
   );
-
-  browser.runtime.onMessage.addListener((message: InternalBroadcastEvent) => {
-    if (message.messageType === 'broadcastEvent') {
-      eventRuntime.handleEvent(message);
-    }
-  });
 
   initTransportAPI({
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
