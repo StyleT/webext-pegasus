@@ -4,7 +4,11 @@ import {getRPCService} from '@webext-pegasus/rpc';
 
 import {extensionStoreReady} from './store';
 
-export function renderStoreCounterUI(contextName: string) {
+interface Props {
+  onValueChange?: (value: number) => void;
+}
+
+export function renderStoreCounterUI(contextName: string, props: Props = {}) {
   extensionStoreReady()
     .then(async (store) => {
       // eslint-disable-next-line no-console
@@ -23,6 +27,7 @@ export function renderStoreCounterUI(contextName: string) {
       console.log(
         `@webext/pegasus ${contextName}: counter current value: ${counter}`,
       );
+      props.onValueChange?.(counter);
 
       store.subscribe((state) => {
         const newCounter = state.simpleCounterForTab[tabID];
@@ -33,6 +38,7 @@ export function renderStoreCounterUI(contextName: string) {
             `@webext/pegasus ${contextName}: counter NEW value: ${counter}`,
             state,
           );
+          props.onValueChange?.(counter);
         }
       });
 
