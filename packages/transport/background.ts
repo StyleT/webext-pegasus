@@ -10,6 +10,7 @@ import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {PortMessage} from './src/PortMessage';
 import {initTransportAPI} from './src/TransportAPI';
+import {InternalBroadcastEvent} from './src/types-internal';
 import {decodeConnectionArgs} from './src/utils/connection-args';
 import {createDeliveryLogger} from './src/utils/delivery-logger';
 import {createFingerprint} from './src/utils/endpoint-fingerprint';
@@ -350,20 +351,38 @@ export function initPegasusTransport(): void {
     });
   });
 
+  let undeliveredEvents: InternalBroadcastEvent[] | undefined = [];
+  // PersistentPort usually reconnects within 500ms
+  setTimeout(() => {
+    Promise.all((undeliveredEvents as InternalBroadcastEvent[]).map(routeEvent)).catch(err => {
+      console.error('Error while tying to deliver undelivered events:', err);
+    });
+    undeliveredEvents = undefined;
+  }, 500);
+
+  const routeEvent = async (event: InternalBroadcastEvent) => {
+    // Background SW just resumed it's work and there are no connections yet
+    // so we need to queue the event for later delivery
+    if (connMap.size === 0 && undeliveredEvents !== undefined) {
+      undeliveredEvents.push(event);
+      return;
+    }
+
+    connMap.forEach((port, endpoint) => {
+      notifyEndpoint(endpoint)
+        .withFingerprint(port.fingerprint)
+        .aboutIncomingMessage(event);
+    });
+
+    // So background listeners receive events from other contexts
+    if (event.origin.context !== 'background') {
+      eventRuntime.handleEvent(event);
+    }
+  }
+
   const eventRuntime = createBroadcastEventRuntime(
     'background',
-    async (event) => {
-      connMap.forEach((port, endpoint) => {
-        notifyEndpoint(endpoint)
-          .withFingerprint(port.fingerprint)
-          .aboutIncomingMessage(event);
-      });
-
-      // So background listeners receive events from other contexts
-      if (event.origin.context !== 'background') {
-        eventRuntime.handleEvent(event);
-      }
-    },
+    routeEvent,
   );
 
   initTransportAPI({
