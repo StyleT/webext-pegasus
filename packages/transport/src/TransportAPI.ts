@@ -1,4 +1,4 @@
-import {TransportAPI} from './types';
+import {TransportAPI} from './types-internal';
 
 let API: TransportAPI | null = null;
 

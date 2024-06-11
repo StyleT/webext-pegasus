@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill';
+
 import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {createPersistentPort} from './src/PersistentPort';
@@ -19,6 +21,7 @@ export function initPegasusTransport(): void {
   });
 
   initTransportAPI({
+    browser: browser,
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
     onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,

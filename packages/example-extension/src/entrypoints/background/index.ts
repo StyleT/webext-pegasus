@@ -35,5 +35,7 @@ export default defineBackground(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (globalThis as any).pegasusEventBus = eventBus;
 
-  initExtensionStoreBackend();
+  initExtensionStoreBackend().catch((err) =>
+    console.error('Error initializing extension store backend', err),
+  );
 });

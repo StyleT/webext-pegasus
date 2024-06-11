@@ -39,6 +39,7 @@ export function initPegasusTransport({namespace}: Props = {}): void {
     win.enable();
   }
   initTransportAPI({
+    browser: null,
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
     onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,

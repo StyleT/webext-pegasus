@@ -2,7 +2,8 @@
 import {JsonValue} from 'type-fest';
 
 import {definePegasusEventBus} from './definePegasusEventBus';
-import {PegasusMessage, TransportBroadcastEventAPI} from './types';
+import {PegasusMessage} from './types';
+import {TransportBroadcastEventAPI} from './types-internal';
 
 interface ProtocolMap {
   message1: void;
