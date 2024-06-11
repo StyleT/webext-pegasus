@@ -21,7 +21,7 @@ export class StoreCommunicationBridge<
   constructor(
     private readonly store: IPegasusStore<S, A>,
     private readonly serializer: SerializerFn<S | A>,
-    private readonly deserializer: DeserializerFn<A>,
+    private readonly deserializer: DeserializerFn<S | A>,
   ) {}
 
   fetchState(_message: PegasusRPCMessage): string {
@@ -36,7 +36,7 @@ export class StoreCommunicationBridge<
     serializedMessage: string,
   ): Promise<string> {
     return this.serializer(
-      await this.store.dispatch(this.deserializer(serializedMessage)),
+      await this.store.dispatch(this.deserializer(serializedMessage) as A),
     );
   }
 }

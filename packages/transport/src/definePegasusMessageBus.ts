@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {getTransportAPI} from './TransportAPI';
-import { TransportMessagingAPI } from './types-internal';
+import {TransportMessagingAPI} from './types-internal';
 
 declare const MissingProtocolMap: unique symbol;
 type MissingProtocolMapType = typeof MissingProtocolMap;

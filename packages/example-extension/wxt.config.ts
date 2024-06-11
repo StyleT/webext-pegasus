@@ -7,7 +7,7 @@ export default defineConfig({
   debug: !!process.env.DEBUG_WXT,
   manifest: (configEnv) => {
     const manifestConf: UserManifest = {
-      permissions: ['tabs'],
+      permissions: ['tabs', 'storage'],
       web_accessible_resources: [
         {
           extension_ids: [],

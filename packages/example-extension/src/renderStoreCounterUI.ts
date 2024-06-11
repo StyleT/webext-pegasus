@@ -31,13 +31,14 @@ export function renderStoreCounterUI(contextName: string, props: Props = {}) {
 
       const counterCTA = document.createElement('button');
       document.body?.appendChild(counterCTA);
-      const updateCounterCTA = () => counterCTA.innerText = `Increment counter (${contextName}): ${counter}`;
+      const updateCounterCTA = () =>
+        (counterCTA.innerText = `Increment counter (${contextName}): ${counter}`);
       updateCounterCTA();
 
       store.subscribe((state) => {
         const newCounter = state.simpleCounterForTab[tabID] ?? 0;
         if (newCounter !== counter) {
-          counter = store.getState().simpleCounterForTab[tabID];
+          counter = store.getState().simpleCounterForTab[tabID] ?? 0;
           // eslint-disable-next-line no-console
           console.log(
             `@webext/pegasus ${contextName}: counter NEW value: ${counter}`,

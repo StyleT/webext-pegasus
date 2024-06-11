@@ -1,6 +1,6 @@
-import { type Browser } from 'webextension-polyfill';
+import {type Browser} from 'webextension-polyfill';
 
-import { getTransportAPI } from './TransportAPI';
+import {getTransportAPI} from './TransportAPI';
 
 export function definePegasusBrowserAPI(): Browser | null {
   const {browser} = getTransportAPI();

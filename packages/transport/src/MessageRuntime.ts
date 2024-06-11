@@ -1,7 +1,4 @@
-import type {
-  OnMessageCallback,
-  RuntimeContext,
-} from './types';
+import type {OnMessageCallback, RuntimeContext} from './types';
 import type {InternalMessage, TransportMessagingAPI} from './types-internal';
 import type {JsonValue} from 'type-fest';
 

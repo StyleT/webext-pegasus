@@ -23,19 +23,19 @@ describe('initPegasusStoreBackend', () => {
 
   describe('on receiving messages', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let store: IPegasusStore<any, any>,
+    let storeInitFn: () => IPegasusStore<any, any>,
       payload: object,
       dispatch: jest.Mock<Dispatch>;
 
     beforeEach(function () {
       dispatch = jest.fn((action) => Promise.resolve(action));
-      store = {
+      storeInitFn = () => ({
         dispatch: dispatch,
         getState: () => ({}),
         subscribe: () => {
           return () => ({});
         },
-      };
+      });
 
       payload = {
         a: 'a',
@@ -49,7 +49,7 @@ describe('initPegasusStoreBackend', () => {
         () => {},
       );
 
-      initPegasusStoreBackend(store, {
+      await initPegasusStoreBackend(storeInitFn, {
         deserializer: noop,
         portName,
         serializer: noop,
@@ -77,7 +77,7 @@ describe('initPegasusStoreBackend', () => {
         () => {},
       );
 
-      initPegasusStoreBackend(store, {
+      await initPegasusStoreBackend(storeInitFn, {
         deserializer,
         portName,
         serializer,
@@ -103,7 +103,7 @@ describe('initPegasusStoreBackend', () => {
     });
   });
 
-  it('should serialize initial state and subsequent patches correctly', function () {
+  it('should serialize initial state and subsequent patches correctly', async function () {
     const onEventInitHandler = jest.fn();
     addPegasusEventHandler(
       `pegasusStore/${portName}/${MessageType.STATE}`,
@@ -155,7 +155,7 @@ describe('initPegasusStoreBackend', () => {
       },
     ];
 
-    initPegasusStoreBackend(store, {
+    await initPegasusStoreBackend(() => store, {
       deserializer,
       diffStrategy,
       portName,
@@ -177,7 +177,7 @@ describe('initPegasusStoreBackend', () => {
     subscribers.forEach((subscriber) => subscriber());
   });
 
-  it("should not send patches if state hasn't been changed", function () {
+  it("should not send patches if state hasn't been changed", async function () {
     const onEventPatchHandler = jest.fn();
     addPegasusEventHandler(
       `pegasusStore/${portName}/${MessageType.PATCH_STATE}`,
@@ -218,7 +218,7 @@ describe('initPegasusStoreBackend', () => {
       () => {},
     );
 
-    initPegasusStoreBackend(store, {
+    await initPegasusStoreBackend(() => store, {
       deserializer,
       portName,
       serializer,

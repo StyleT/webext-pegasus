@@ -1,5 +1,5 @@
 import {JsonValue} from 'type-fest';
-import { type Browser } from 'webextension-polyfill';
+import {type Browser} from 'webextension-polyfill';
 
 import {
   Destination,
@@ -64,7 +64,6 @@ export interface TransportBroadcastEventAPI<
     data: TProtocolMap[TType],
   ) => Promise<void>;
 }
-
 
 export interface TransportAPI
   extends TransportMessagingAPI,

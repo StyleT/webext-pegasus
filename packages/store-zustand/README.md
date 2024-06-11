@@ -45,7 +45,10 @@ export const useBearStore = create<BearState>()((set) => ({
 
 export const STORE_NAME = 'GlobalBearStore';
 
-export function bearStoreReady = () => pegasusZustandStoreReady(STORE_NAME, useBearStore);
+export const bearStoreBackendReady = () =>
+  initPegasusZustandStoreBackend(STORE_NAME, useBearStore);
+export const bearStoreReady = () =>
+  pegasusZustandStoreReady(STORE_NAME, useBearStore);
 ```
 
 `background.ts`
@@ -54,18 +57,19 @@ export function bearStoreReady = () => pegasusZustandStoreReady(STORE_NAME, useB
 import { initPegasusTransport } from '@webext-pegasus/transport/background';
 import { initPegasusZustandStoreBackend } from '@webext-pegasus/store-zustand';
 
-import {useBearStore as store, STORE_NAME} from './store';
+import {bearStoreBackendReady} from './store';
 
 initPegasusTransport();
-initPegasusZustandStoreBackend(STORE_NAME, store);
 
-// listen state changes
-store.subscribe((state) => {
-  // console.log(state);
+bearStoreBackendReady().then(store => {
+  // listen state changes
+  store.subscribe((state) => {
+    // console.log(state);
+  });
+
+  // dispatch
+  // store.getState().increase(2);
 });
-
-// dispatch
-// store.getState().increase(2);
 ```
 
 `popup.tsx`
@@ -144,6 +148,23 @@ bearStoreReady().then(() => {
   );
 });
 ```
+
+## Special use case: Manifest V3 service worker
+
+In MV3 extensions A service worker replaces the extension's background or event page to ensure that background code stays off the main thread. This enables extensions to run only when needed, saving resources. 
+
+However this also means that on the contrary to the constantly running background script MV3 SW terminates when not in use, you'll need to persist application states rather than rely on global variables.
+
+Fortunately this library provides a simple solution for this problem! You only need to do couple of changes to your extension:
+
+1. Enable `storage` permission for your extension. State for your Pegasus Stores will be persisted via [`browser.storage`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage) API
+2. Pass and additional `storageStrategy` parameter to witin your background script:
+
+    ```javascript
+    initPegasusZustandStoreBackend(STORE_NAME, store, {
+      storageStrategy: 'session' // use "local" to persist store across browser sessions or "sync" for store used for extension settings
+    });
+    ```
 
 ## Credits
 

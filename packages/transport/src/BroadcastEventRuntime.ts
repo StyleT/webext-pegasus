@@ -1,13 +1,13 @@
-import type {
-  PegasusMessage,
-  RuntimeContext,
-} from './types';
+import type {PegasusMessage, RuntimeContext} from './types';
 import type {JsonValue} from 'type-fest';
 
 import {serializeError} from 'serialize-error';
 import uuid from 'tiny-uid';
 
-import {InternalBroadcastEvent, TransportBroadcastEventAPI} from './types-internal';
+import {
+  InternalBroadcastEvent,
+  TransportBroadcastEventAPI,
+} from './types-internal';
 
 export interface BroadcastEventRuntime extends TransportBroadcastEventAPI {
   /**

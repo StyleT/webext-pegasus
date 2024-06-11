@@ -354,7 +354,9 @@ export function initPegasusTransport(): void {
   let undeliveredEvents: InternalBroadcastEvent[] | undefined = [];
   // PersistentPort usually reconnects within 500ms
   setTimeout(() => {
-    Promise.all((undeliveredEvents as InternalBroadcastEvent[]).map(routeEvent)).catch(err => {
+    Promise.all(
+      (undeliveredEvents as InternalBroadcastEvent[]).map(routeEvent),
+    ).catch((err) => {
       console.error('Error while tying to deliver undelivered events:', err);
     });
     undeliveredEvents = undefined;
@@ -378,12 +380,9 @@ export function initPegasusTransport(): void {
     if (event.origin.context !== 'background') {
       eventRuntime.handleEvent(event);
     }
-  }
+  };
 
-  const eventRuntime = createBroadcastEventRuntime(
-    'background',
-    routeEvent,
-  );
+  const eventRuntime = createBroadcastEventRuntime('background', routeEvent);
 
   initTransportAPI({
     browser: browser,
