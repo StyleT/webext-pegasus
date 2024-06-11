@@ -1,6 +1,15 @@
 import {JsonValue} from 'type-fest';
 
-import {Endpoint} from './types';
+import {
+  Endpoint,
+  TransportBroadcastEventAPI,
+  TransportMessagingAPI,
+} from './types';
+
+export interface TransportAPI
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extends TransportMessagingAPI,
+    TransportBroadcastEventAPI {}
 
 export interface InternalPacket {
   origin: Endpoint;

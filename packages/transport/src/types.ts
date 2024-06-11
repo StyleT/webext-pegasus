@@ -94,8 +94,3 @@ export interface TransportBroadcastEventAPI<
     data: TProtocolMap[TType],
   ) => Promise<void>;
 }
-
-export interface TransportAPI
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  extends TransportMessagingAPI,
-    TransportBroadcastEventAPI {}

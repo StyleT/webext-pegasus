@@ -3,7 +3,7 @@ import type {PegasusMessage} from '../packages/transport';
 import {JsonValue} from 'type-fest';
 
 import {initTransportAPI} from '../packages/transport/src/TransportAPI';
-import {TransportAPI} from '../packages/transport/src/types';
+import {TransportAPI} from '../packages/transport/src/types-internal';
 
 const listeners: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
