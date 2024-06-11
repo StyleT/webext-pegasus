@@ -386,6 +386,7 @@ export function initPegasusTransport(): void {
   );
 
   initTransportAPI({
+    browser: browser,
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
     onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,

@@ -1,10 +1,5 @@
+export {definePegasusBrowserAPI} from './src/definePegasusBrowserAPI';
 export {definePegasusEventBus} from './src/definePegasusEventBus';
 export {definePegasusMessageBus} from './src/definePegasusMessageBus';
 export {isInternalEndpoint} from './src/isInternalEndpoint';
-export {
-  Destination,
-  Endpoint,
-  OnMessageCallback,
-  PegasusMessage,
-  RuntimeContext,
-} from './src/types';
+export * from './src/types';
