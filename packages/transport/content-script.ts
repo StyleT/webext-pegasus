@@ -19,7 +19,12 @@ export function initPegasusTransport({
   const messageRuntime = createMessageRuntime(
     'content-script',
     async (message) => {
-      if (message.destination.context === 'window') {
+      if (
+        message.destination.context === 'window' &&
+        // if the message is addressed to the window, we need to make sure
+        // that current content script is the top level script
+        window.top === window
+      ) {
         await win.postMessage(message);
       } else {
         port.postMessage(message);
