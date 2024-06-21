@@ -1,8 +1,14 @@
+import type {ISelfIDService} from './background/getSelfIDService';
 import type {ITestEventBus} from '@/ITestEventBus';
 
-import {definePegasusEventBus} from '@webext-pegasus/transport';
+import {getRPCService} from '@webext-pegasus/rpc';
+import {
+  definePegasusEventBus,
+  definePegasusMessageBus,
+} from '@webext-pegasus/transport';
 import {initPegasusTransport} from '@webext-pegasus/transport/window';
 
+import {ITestMessageBus} from '@/ITestMessageBus';
 import {renderStoreCounterUI} from '@/renderStoreCounterUI';
 
 export default defineUnlistedScript({
@@ -20,6 +26,22 @@ export default defineUnlistedScript({
     eventBus.emitBroadcastEvent(
       'test-event',
       'Hello world from injected script!',
+    );
+
+    const messageBus = definePegasusMessageBus<ITestMessageBus>();
+    messageBus.onMessage('test-message', (data) => {
+      // eslint-disable-next-line no-console
+      console.log('Received test-message at injected script', data);
+    });
+    getRPCService<ISelfIDService>('getSelfID', 'background')().then(({tabId}) =>
+      messageBus.sendMessage(
+        'test-message',
+        'Hello world from injected script!',
+        {
+          context: 'content-script',
+          tabId,
+        },
+      ),
     );
 
     renderStoreCounterUI('window-script');

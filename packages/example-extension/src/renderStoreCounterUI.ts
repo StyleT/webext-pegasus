@@ -1,4 +1,4 @@
-import type {ITabIDService} from './entrypoints/background/getTabIDService';
+import type {ISelfIDService} from './entrypoints/background/getSelfIDService';
 
 import {getRPCService} from '@webext-pegasus/rpc';
 
@@ -14,8 +14,8 @@ export function renderStoreCounterUI(contextName: string, props: Props = {}) {
       // eslint-disable-next-line no-console
       console.log(`@webext/pegasus ${contextName}: store ready.`);
 
-      const tabID = await getRPCService<ITabIDService>(
-        'getTabID',
+      const {tabId: tabID} = await getRPCService<ISelfIDService>(
+        'getSelfID',
         'background',
       )();
 

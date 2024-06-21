@@ -7,7 +7,7 @@ import {initPegasusTransport} from '@webext-pegasus/transport/background';
 import {initExtensionStoreBackend} from '@/store';
 
 import {getTestHelloService} from '../../getTestHelloService';
-import {getTabIDService} from './getTabIDService';
+import {getSelfIDService} from './getSelfIDService';
 
 export default defineBackground(() => {
   initPegasusTransport();
@@ -21,7 +21,7 @@ export default defineBackground(() => {
   registerRPCService('getTestHello', getTestHelloService);
 
   // Way for content script & injected scripts to get their tab ID
-  registerRPCService('getTabID', getTabIDService);
+  registerRPCService('getSelfID', getSelfIDService);
 
   const eventBus = definePegasusEventBus<ITestEventBus>();
   eventBus.onBroadcastEvent('test-event', (data) => {

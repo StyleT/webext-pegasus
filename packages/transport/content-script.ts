@@ -23,7 +23,11 @@ export function initPegasusTransport({
         message.destination.context === 'window' &&
         // if the message is addressed to the window, we need to make sure
         // that current content script is the top level script
-        window.top === window
+        window.top === window &&
+        // If the message is addressed to the specific tab, we need to pass it to background script
+        // first to forward it to the correct tab / frame
+        !message.destination.tabId &&
+        !message.destination.frameId
       ) {
         await win.postMessage(message);
       } else {
