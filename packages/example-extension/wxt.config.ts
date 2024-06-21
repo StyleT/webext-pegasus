@@ -1,4 +1,3 @@
-import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig, UserManifest} from 'wxt';
 
@@ -36,6 +35,7 @@ export default defineConfig({
 
     return manifestConf;
   },
+  modules: ['@wxt-dev/module-react'],
   runner: {
     binaries: {
       edge: '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
@@ -56,7 +56,4 @@ export default defineConfig({
     ],
   },
   srcDir: './src',
-  vite: () => ({
-    plugins: [react()],
-  }),
 });
