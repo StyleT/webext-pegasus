@@ -5,10 +5,22 @@ import {PegasusStore} from '@webext-pegasus/store';
 import getConfiguration from './getConfiguration';
 import {ZustandAction} from './types';
 
+const storeRegistry = new WeakMap<
+  StoreApi<unknown>,
+  {[key: string]: Promise<void>}
+>();
+
 export async function pegasusZustandStoreReady<S>(
   storeName: string,
   store: StoreApi<S>,
 ): Promise<StoreApi<S>> {
+  const storeRecord = storeRegistry.get(store) ?? {};
+  if (storeRecord[storeName] !== undefined) {
+    await storeRecord[storeName];
+
+    return store;
+  }
+
   const configuration = getConfiguration();
 
   const proxyStore = new PegasusStore<S, ZustandAction<S>>({
@@ -16,10 +28,17 @@ export async function pegasusZustandStoreReady<S>(
     portName: storeName,
     state: store.getState(),
   });
+
   // wait to be ready
-  await proxyStore.ready();
-  // initial state
-  store.setState(proxyStore.getState());
+  const storeReadinessPromise = proxyStore.ready().then(() => {
+    // initial state
+    store.setState(proxyStore.getState());
+  });
+  storeRegistry.set(store, {
+    ...storeRecord,
+    [storeName]: storeReadinessPromise,
+  });
+  await storeReadinessPromise;
 
   const callback = (state: S, oldState: S) => {
     proxyStore
