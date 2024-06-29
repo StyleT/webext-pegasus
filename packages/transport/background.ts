@@ -1,4 +1,5 @@
 import type {RequestMessage} from './src/PortMessage';
+import type { Logger } from './src/types';
 import type {InternalPacket} from './src/types-internal';
 import type {DeliveryReceipt} from './src/utils/delivery-logger';
 import type {EndpointFingerprint} from './src/utils/endpoint-fingerprint';
@@ -25,7 +26,16 @@ interface PortConnection {
   fingerprint: EndpointFingerprint;
 }
 
-export function initPegasusTransport(): void {
+type Props = {
+  /**
+   * Logger instance to use for logging, if none is provided, default logger that logs to console will be used.
+   */
+  logger?: Logger;
+};
+
+export function initPegasusTransport({
+  logger,
+}: Props = {}): void {
   const pendingResponses = createDeliveryLogger();
   const connMap = new Map<string, PortConnection>();
   const oncePortConnectedCbs = new Map<string, Set<() => void>>();
@@ -387,6 +397,7 @@ export function initPegasusTransport(): void {
   initTransportAPI({
     browser: browser,
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    logger,
     onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,
     sendMessage: messageRuntime.sendMessage,

@@ -4,6 +4,7 @@ import {type Browser} from 'webextension-polyfill';
 import {
   Destination,
   Endpoint,
+  Logger,
   OnMessageCallback,
   PegasusMessage,
 } from './types';
@@ -68,7 +69,9 @@ export interface TransportBroadcastEventAPI<
 export interface TransportAPI
   extends TransportMessagingAPI,
     TransportBroadcastEventAPI,
-    TransportBrowserAPI {}
+    TransportBrowserAPI {
+      logger: Logger | undefined;
+    }
 
 export interface InternalPacket {
   origin: Endpoint;

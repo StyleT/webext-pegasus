@@ -2,6 +2,7 @@ import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
 import {createMessageRuntime} from './src/MessageRuntime';
 import {usePostMessaging} from './src/post-message';
 import {initTransportAPI} from './src/TransportAPI';
+import { Logger } from './src/types';
 import {
   isInternalBroadcastEvent,
   isInternalMessage,
@@ -9,9 +10,13 @@ import {
 
 type Props = {
   namespace?: string;
+  /**
+   * Logger instance to use for logging, if none is provided, default logger that logs to console will be used.
+   */
+  logger?: Logger;
 };
 
-export function initPegasusTransport({namespace}: Props = {}): void {
+export function initPegasusTransport({namespace, logger}: Props = {}): void {
   const win = usePostMessaging('window');
 
   const messageRuntime = createMessageRuntime('window', (message) =>
@@ -41,6 +46,7 @@ export function initPegasusTransport({namespace}: Props = {}): void {
   initTransportAPI({
     browser: null,
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    logger,
     onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,
     sendMessage: messageRuntime.sendMessage,

@@ -95,7 +95,6 @@
   "homepage": "https://github.com/StyleT/webext-pegasus#readme",
   "dependencies": {
     "@types/webextension-polyfill": "^0.10.7",
-    "nanoevents": "^6.0.2",
     "serialize-error": "^9.0.0",
     "tiny-uid": "^1.1.1",
     "type-fest": "^2.11.1",

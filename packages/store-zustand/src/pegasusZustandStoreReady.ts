@@ -1,6 +1,7 @@
 import type {StoreApi} from 'zustand';
 
 import {PegasusStore} from '@webext-pegasus/store';
+import { definePegasusLogger } from 'packages/transport';
 
 import getConfiguration from './getConfiguration';
 import {ZustandAction} from './types';
@@ -20,6 +21,8 @@ export async function pegasusZustandStoreReady<S>(
 
     return store;
   }
+
+  const logger = definePegasusLogger().child({module: 'webext-pegasus:store-zustand'});
 
   const configuration = getConfiguration();
 
@@ -59,17 +62,7 @@ export async function pegasusZustandStoreReady<S>(
         }
       })
       .catch((err) => {
-        if (
-          err instanceof Error &&
-          err.message === 'Extension context invalidated.'
-        ) {
-          console.warn(
-            'Webext-Zustand: Reloading page as we lost connection to background script...',
-          );
-          window.location.reload();
-          return;
-        }
-        console.error('Error during store dispatch', err);
+        logger.error({err}, 'Error during store dispatch');
       });
   };
 

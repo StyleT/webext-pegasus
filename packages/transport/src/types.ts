@@ -39,3 +39,5 @@ export type OnMessageCallback<
 > = (
   message: PegasusMessage<GetMessageProtocolDataType<TProtocolMap[TType]>>,
 ) => MaybePromise<GetMessageProtocolReturnType<TProtocolMap[TType]>>;
+
+export * from './logger/types';

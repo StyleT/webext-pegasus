@@ -1,3 +1,5 @@
+import type { Logger } from './src/types';
+
 import browser from 'webextension-polyfill';
 
 import {createBroadcastEventRuntime} from './src/BroadcastEventRuntime';
@@ -9,10 +11,15 @@ import {internalPacketTypeRouter} from './src/utils/internalPacketTypeRouter';
 
 type Props = {
   allowWindowMessagingForNamespace?: string;
+  /**
+   * Logger instance to use for logging, if none is provided, default logger that logs to console will be used.
+   */
+  logger?: Logger;
 };
 
 export function initPegasusTransport({
   allowWindowMessagingForNamespace,
+  logger,
 }: Props = {}): void {
   const win = usePostMessaging('content-script');
   const port = createPersistentPort();
@@ -84,8 +91,9 @@ export function initPegasusTransport({
   }
 
   initTransportAPI({
-    browser: browser,
+    browser,
     emitBroadcastEvent: eventRuntime.emitBroadcastEvent,
+    logger,
     onBroadcastEvent: eventRuntime.onBroadcastEvent,
     onMessage: messageRuntime.onMessage,
     sendMessage: messageRuntime.sendMessage,
