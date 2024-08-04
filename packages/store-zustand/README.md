@@ -21,8 +21,8 @@ npm install -S @webext-pegasus/transport @webext-pegasus/store-zustand
 
 - Create a store based on https://github.com/pmndrs/zustand.
 - You can create a store either reactive way or vanilla.
-- Wrap the store with `wrapStore`. Import the store from the background.
-- You should await for the store to connect to the background.
+- Wrap the store with `initPegasusZustandStoreBackend`. Import the store from the background or any other extension context.
+- Wait for the store to be ready (connected to background) via `pegasusZustandStoreReady`.
 
 That's it! Now your store is available from everywhere.
 
@@ -31,7 +31,7 @@ That's it! Now your store is available from everywhere.
 ```js
 import { create } from 'zustand'
 // or import { createStore } from 'zustand/vanilla'
-import { wrapStore } from 'webext-zustand'
+import { initPegasusZustandStoreBackend, pegasusZustandStoreReady } from 'webext-zustand'
 
 interface BearState {
   bears: number
