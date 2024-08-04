@@ -26,6 +26,9 @@ npm install -S @webext-pegasus/transport @webext-pegasus/store-zustand
 
 That's it! Now your store is available from everywhere.
 
+> [!TIP]
+> Refer to [./packages/example-extension](https://github.com/StyleT/webext-pegasus/tree/main/packages/example-extension) for more examples.
+
 `store.ts`
 
 ```js

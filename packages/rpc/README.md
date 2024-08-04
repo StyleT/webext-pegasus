@@ -26,6 +26,8 @@ npm install -S @webext-pegasus/transport @webext-pegasus/rpc
 - Acquire service wrapper via `getRPCService<YourServiceType>('serviceName', 'background')`
   - _That's it! Now you can call it from any other place in your extension!_
 
+> [!TIP]
+> Refer to [./packages/example-extension](https://github.com/StyleT/webext-pegasus/tree/main/packages/example-extension) for more examples.
 
 **MathService.ts**
 ```typescript

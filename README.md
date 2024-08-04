@@ -19,6 +19,9 @@ Communication framework for browser extensions, with wings!
 - [`@webext-pegasus/store`](./packages/store/) - APIs for building Redux/Zustand/Mobx/etc applications in Web Extensions.
 - [`@webext-pegasus/transport`](./packages/transport/) - Low level transport layer that allows to use same APIs within all runtime contexts (especially important for reusable components) while mitigating issues like this one [zikaari/crx-bridge#11](https://github.com/zikaari/crx-bridge/issues/11)
 
+> [!TIP]
+> Please refer to individual package `README.md` files for respective packages as well as [./packages/example-extension](./packages/example-extension) for examples.
+
 ## Supports
 
 * **Runtime contexts:** window (injected script), popup, devtools, content script, background, options, sidepanel (_planned_)
