@@ -38,8 +38,17 @@ export type IMathService = InstanceType<
 export class MathService
   implements IPegasusRPCService<MathService>
 {
-  fibonacci(num: number): number {
-    return (num <= 1) ? 1 : this.fibonacci(num - 1) + this.fibonacci(num - 2);
+  // Every public method shall:
+  // - accept "sender: PegasusRPCMessage" as first parameter, if it accepts any params
+  // - accept / return only serializable values, as RPC messages must be serialized as they move between extension contexts 
+  // See "./src/types.test.ts" for more examples
+  fibonacci(_sender: PegasusRPCMessage, num: number): number {
+    return this.#fibonacciImpl(num);
+  }
+
+  // We keep implemenation in private method as we don't need sender information here
+  #fibonacciImpl(num: number): number {
+    return (num <= 1) ? 1 : this.#fibonacciImpl(num - 1) + this.#fibonacciImpl(num - 2);
   }
 }
 ```
