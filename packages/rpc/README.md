@@ -93,3 +93,65 @@ const mathService = getRPCService<IMathService>(
 mathService.fibonacci(10).then(console.log);
 // Output: 89
 ```
+
+## Functional services
+
+This library also allows you to define RPC service as a function ([as showcased in example](/packages/example-extension/src/getTestHelloService.ts)).
+
+**getTestHelloService.ts**
+```typescript
+import {PegasusRPCMessage} from '@webext-pegasus/rpc';
+
+export type ITestHelloService = typeof getTestHelloService;
+
+export function getTestHelloService(
+  _message: PegasusRPCMessage,
+  name: string,
+): string {
+  return `Warmest hello for ${name} from the service!`;
+}
+```
+
+Which can be later called (don't forget to register it first via `registerRPCService`) in the following way:
+
+```typescript
+const getTestHelloService = getRPCService<ITestHelloService>(
+  'getTestHello',
+  'background',
+);
+
+getTestHelloService('Mike').then(console.log);
+// Will print: 
+// Warmest hello for Mike from the service!
+```
+
+## PegasusRPCMessage
+
+Message information provided as a first parameter to every public method of Pegasus RPC service serves a purpose of identifying caller identity and providing relevant response.
+
+This is useful for example to create a `SelfIDService` that allows to retrieve it's `tabId` and `frameId` for content script, window script or popup.
+
+**getSelfIDService.ts**
+
+```typescript
+import {PegasusRPCMessage} from '@webext-pegasus/rpc';
+import browser from 'webextension-polyfill';
+
+export type ISelfIDService = typeof getSelfIDService;
+
+export async function getSelfIDService(message: PegasusRPCMessage): Promise<{
+  tabId: number;
+  frameId?: number;
+}> {
+  let tabId: number | undefined = message.sender.tabId;
+  if (message.sender.context === 'popup') {
+    tabId = (await browser.tabs.query({active: true, currentWindow: true}))[0]
+      .id;
+  }
+  if (tabId === undefined) {
+    throw new Error(`Could not get tab ID for message: ${message.toString()}`);
+  }
+  return {frameId: message.sender.frameId, tabId};
+}
+
+```
