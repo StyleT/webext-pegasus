@@ -24,6 +24,7 @@ const config: Config = {
         '^@webext-pegasus/transport$': '<rootDir>/packages/transport/index.ts',
         '^@webext-pegasus/transport/(.+)$': '<rootDir>/packages/transport/$1',
       },
+      modulePathIgnorePatterns: ['<rootDir>/packages/example-extension/'],
       preset: 'ts-jest',
       setupFilesAfterEnv: ['<rootDir>/test-utils/testPegasus.ts'],
       testEnvironment: 'jsdom',
