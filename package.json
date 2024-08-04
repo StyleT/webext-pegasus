@@ -24,7 +24,7 @@
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write .",
     "link": "npm link --workspaces",
-    "bump-version": "lerna version",
+    "bump-version": "lerna version --force-publish --no-push",
     "publish": "npm publish --workspaces --access public",
     "test:unit": "jest --selectProjects unit --testPathPattern",
     "test:unit:coverage": "npm run test:unit -- --collect-coverage",
