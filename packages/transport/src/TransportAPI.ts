@@ -21,7 +21,7 @@ export function initTransportAPI(api: TransportAPI): void {
 export function getTransportAPI(): TransportAPI {
   if (API == null) {
     throw new Error(
-      'Messaging API wan\'t set. Make sure you called "initPegasusTransport" within current context before using @webext-pegasus packages.',
+      'Messaging API wasn\'t set. Make sure you called "initPegasusTransport" within current context before using @webext-pegasus packages.',
     );
   }
 
